@@ -44,3 +44,9 @@ def test_mistyped_parameter_fails_provenance():
     scenario = SCENARIOS["lab03"]
     broken = type(scenario)(scenario.lab, scenario.run, [*scenario.declared[:-1], 1.5001])
     assert any("1.5001" in p for p in bench.provenance("lab03", {}, broken))
+
+
+def test_wrong_override_fails_provenance():
+    scenario = SCENARIOS["lab01_md1643"]
+    broken = type(scenario)(scenario.lab, scenario.run, scenario.declared, scenario.golden, 5000.0)
+    assert any("overrides" in p for p in bench.provenance("lab01_md1643", {}, broken))
