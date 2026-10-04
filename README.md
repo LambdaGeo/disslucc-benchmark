@@ -48,13 +48,16 @@ disslucc `450f4db` (0.4.0) · dissmodel 0.6.5 · goldens: `luccme-goldens` @ `85
 | `lab15` | PreComputed + DLogisticRegression + DClueSLike (300) | 5,914 | 1999–2004 | identical | 3.0e-08 | 1.2e-07 | iterations exact, max ≤ 1e-6 | match |
 | `lab01_md1643` | `lab01` with `maxDifference` 1643 (`MD=1643`): the convergence loop runs, **0,0,8,26,18,17,17** iterations per year | 6,574 | 2008–2014 | identical | 3.0e-08 | 5.1e-07 | iterations exact, max ≤ 1e-6 | match |
 | `lab15_md10` | `lab15` with `maxDifference` 10 (`MD=10`): **0,67,56,56,61,61** iterations per year | 5,914 | 1999–2004 | identical | 3.0e-08 | 1.2e-07 | iterations exact, max ≤ 1e-6 | match |
+| `lab01_md1643/cell_correction` | `lab01_md1643` with disslucc's default: **0,0,0,14,17,16,16** iterations per year (TerraME: 0,0,8,26,18,17,17) | 6,574 | 2008–2014 | differ | 2.6e-03 | 2.7e-02 | reported only | differs (by design) |
 | `lab01/cell_correction` | `lab01` with disslucc's default | 6,574 | 2008–2014 | identical | 1.4e-03 | 3.9e-02 | reported only | differs (by design) |
 
 The 5e-13 of lab03/lab06 is the precision of the goldens (12 decimals). The ~1e-7 of lab01/lab15 is float32 noise of the raster backend.
 
 ### Where disslucc differs from LuccME on purpose
 
-`lab01/cell_correction`: LuccME's `AllocationCClueLike` never runs `correctCellChange`: its guard reads `cell.regionregionAloc`, a typo for `regionAloc`, so it is always false. disslucc runs the correction by default (the intended algorithm). The `lab01` scenario sets `cell_correction=False`, which reproduces TerraME in every year and every iteration count; the extra scenario pins the size of the deviation with the default.
+`lab01/cell_correction` and `lab01_md1643/cell_correction`: LuccME's `AllocationCClueLike` never runs `correctCellChange`: its guard reads `cell.regionregionAloc`, a typo for `regionAloc`, so it is always false. disslucc runs the correction by default (the intended algorithm). The `lab01` and `lab01_md1643` scenarios set `cell_correction=False`, which reproduces TerraME in every year and every iteration count; the two extra scenarios pin the size of the deviation with the default.
+
+In `lab01_md1643/cell_correction` the 2014 MAE is **0.0036** in `f` and in `d` (0 in `outros`, max 0.027): the figure `docs/validation.md` of disslucc reports as within the official 0.01 tolerance. All of it is the cell correction that TerraME skips, and the iteration counts also change (0,0,0,14,17,16,16 instead of 0,0,8,26,18,17,17).
 
 ## 4. Coverage of the 21 labs
 

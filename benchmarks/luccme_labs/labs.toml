@@ -49,3 +49,8 @@ max_abs_error = 1e-6
 expect = "match"
 iterations = "exact"
 max_abs_error = 1e-6
+
+["lab01_md1643/cell_correction"]
+# disslucc's default against the md1643 golden; the deviation that docs/validation.md reports.
+expect = "differs"
+iterations = "exact"

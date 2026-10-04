@@ -274,6 +274,10 @@ SCENARIOS: dict[str, Scenario] = {
                              golden="lab01_md1643", max_difference=1643.0),
     "lab03": Scenario("lab03", lambda: _saturation({}), LAB03_DECLARED),
     "lab06": Scenario("lab06", lambda: _saturation({2009: "csAC_2009"}), LAB03_DECLARED),
+    # disslucc's default (cell_correction=True) against the same golden: where the 0.0036 MAE of
+    # docs/validation.md comes from. Reported only: TerraME never runs correctCellChange.
+    "lab01_md1643/cell_correction": Scenario("lab01", lambda: lab01(cell_correction=True, max_difference=1643.0), LAB01_DECLARED,
+                                             golden="lab01_md1643", max_difference=1643.0),
     "lab15": Scenario("lab15", lab15, LAB15_DECLARED + [LAB15_MAX_DIFFERENCE]),
     "lab15_md10": Scenario("lab15", lambda: lab15(max_difference=10.0), LAB15_DECLARED,
                            golden="lab15_md10", max_difference=10.0),
