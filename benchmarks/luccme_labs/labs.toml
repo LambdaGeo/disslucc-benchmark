@@ -36,3 +36,16 @@ max_error_rel = 1e-9
 expect = "match"
 iterations = "exact"
 max_abs_error = 1e-6
+
+# Variants: the same lab with a smaller `maxDifference`, so the allocation's convergence loop
+# actually runs (the lab scripts accept every year at the first pass).
+
+[lab01_md1643]
+expect = "match"
+iterations = "exact"
+max_abs_error = 1e-6
+
+[lab15_md10]
+expect = "match"
+iterations = "exact"
+max_abs_error = 1e-6

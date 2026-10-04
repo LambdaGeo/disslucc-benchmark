@@ -18,7 +18,7 @@ No reference data is stored here. Goldens, lab scripts and input layers are down
 ```bash
 git clone https://github.com/LambdaGeo/disslucc-benchmark && cd disslucc-benchmark
 make install        # disslucc (pinned commit) + dependencies
-make benchmark      # downloads the references (~16 MB, once), runs, prints the table; exit 1 if a criterion is missed
+make benchmark      # downloads the references (~20 MB, once), runs, prints the table; exit 1 if a criterion is missed
 make coverage       # which of the 21 labs disslucc covers
 make benchmark LAB=lab03   # one scenario
 ```
@@ -38,7 +38,7 @@ The thresholds are **regression guards**, set just above what was measured, not 
 
 ## 3. Results
 
-disslucc `450f4db` (0.4.0) · dissmodel 0.6.5 · goldens: `luccme-goldens` @ `a393b157df42` (TerraME 2.0.1 + LuccME 3.1).
+disslucc `450f4db` (0.4.0) · dissmodel 0.6.5 · goldens: `luccme-goldens` @ `855dad434314` (TerraME 2.0.1 + LuccME 3.1).
 
 | Scenario | Components | Cells | Years | Iterations vs TerraME | MAE (worst column) | Max abs error | Criterion | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -46,6 +46,8 @@ disslucc `450f4db` (0.4.0) · dissmodel 0.6.5 · goldens: `luccme-goldens` @ `a3
 | `lab03` | PreComputed + CSpatialLagRegression + CClueLikeSaturation (1643) | 6,574 | 2008–2014 | identical | 2.3e-13 | 5.0e-13 | iterations exact, max ≤ 1e-9, log max error rel ≤ 1e-9 | match |
 | `lab06` | same as lab03 + `updateYears = {2009}` (`ti` from `csAC_2009`) | 6,574 | 2008–2014 | identical | 2.3e-13 | 5.0e-13 | same as lab03 | match |
 | `lab15` | PreComputed + DLogisticRegression + DClueSLike (300) | 5,914 | 1999–2004 | identical | 3.0e-08 | 1.2e-07 | iterations exact, max ≤ 1e-6 | match |
+| `lab01_md1643` | `lab01` with `maxDifference` 1643 (`MD=1643`): the convergence loop runs, **0,0,8,26,18,17,17** iterations per year | 6,574 | 2008–2014 | identical | 3.0e-08 | 5.1e-07 | iterations exact, max ≤ 1e-6 | match |
+| `lab15_md10` | `lab15` with `maxDifference` 10 (`MD=10`): **0,67,56,56,61,61** iterations per year | 5,914 | 1999–2004 | identical | 3.0e-08 | 1.2e-07 | iterations exact, max ≤ 1e-6 | match |
 | `lab01/cell_correction` | `lab01` with disslucc's default | 6,574 | 2008–2014 | identical | 1.4e-03 | 3.9e-02 | reported only | differs (by design) |
 
 The 5e-13 of lab03/lab06 is the precision of the goldens (12 decimals). The ~1e-7 of lab01/lab15 is float32 noise of the raster backend.
@@ -58,14 +60,15 @@ The 5e-13 of lab03/lab06 is the precision of the goldens (12 decimals). The ~1e-
 
 `make coverage` prints the table; the source is `benchmarks/luccme_labs/catalog.toml`, read from each lab's Lua script.
 
-**Validated: 4 of 21 labs** (lab01, lab03, lab06, lab15). **All components implemented in disslucc: 6 of 21**: the four above plus lab02 and lab07, which have no scenario yet. Missing components, by lab, are in the `missing` field of the catalog (`DemandComputeTwoDates`/`ThreeDates`, `AllocationDSimpleOrdering`, the neighbourhood-based discrete potentials, `AllocationDClueSNeighOrdering`, the sample-based potentials and `PotentialCSpatialLagLinearRegressionMix`).
+**Validated: 4 of 21 labs** (lab01, lab03, lab06, lab15), plus two `maxDifference` variants that exercise the convergence loop. **All components implemented in disslucc: 6 of 21**: the four above plus lab02 and lab07, which have no scenario yet. Missing components, by lab, are in the `missing` field of the catalog (`DemandComputeTwoDates`/`ThreeDates`, `AllocationDSimpleOrdering`, the neighbourhood-based discrete potentials, `AllocationDClueSNeighOrdering`, the sample-based potentials and `PotentialCSpatialLagLinearRegressionMix`).
 
 > `catalog.toml` differs from the table in the `luccme-goldens` README in some labs (for example lab09 and lab13). The catalog follows the Lua scripts, which are what TerraME ran.
 
 ## 5. Limits of this evidence
 
-- **The package labs barely exercise the convergence loop.** In all four, the allocation is accepted at the first pass every year (iterations are `0`), so "iterations identical" is weak evidence here. The variants with a smaller `maxDifference` iterate up to 67 times per year; they are **not in this repository yet** (see section 7).
-- **lab15 is nearly non-discriminative.** A static ranking by `prob_d − prob_f` already reproduces its output; the match shows the regression coefficients were transcribed correctly, not that CLUE-S is faithful. The `lab15` golden also passes with iterations at zero.
+- **The package labs barely exercise the convergence loop.** In lab01, lab03, lab06 and lab15 the allocation is accepted at the first pass every year (iterations are `0`), so "iterations identical" says little there. That is why the two variants exist: with a smaller `maxDifference` the loop runs 8 to 67 times per year, and disslucc reproduces TerraME's iteration count in every year.
+- **The variants are the same lab with `MD=` overriding `maxDifference`.** The golden's manifest records the override and the benchmark checks it against the scenario. They reproduce, to 1e-12, the copies kept in the disslucc repository, which came from the original scripts (`lab1_main.lua` and `lab6_main.lua`).
+- **lab15 (package) is nearly non-discriminative.** With `maxDifference` 300 a static ranking by `prob_d − prob_f` already reproduces its output; the match shows the regression coefficients were transcribed correctly. `lab15_md10` is the one that exercises CLUE-S.
 - **lab03 and lab06 do not reach `correctCellChange` nor saturation** (`changeLimiarValue = 1`). Those branches are checked against the original Lua on synthetic cases in the disslucc repository (`tests/test_lua_differential.py`), which are not part of this benchmark.
 - This is **engineering validation** (same results as a reference run), not scientific validation against observed data.
 
@@ -74,7 +77,7 @@ The 5e-13 of lab03/lab06 is the precision of the goldens (12 decimals). The ~1e-
 | Level | Artifact | Pinned version |
 | --- | --- | --- |
 | Engine | [`disslucc`](https://github.com/DisSModel/disslucc) | commit `450f4db` (`requirements.txt`) |
-| Reference outputs, lab scripts, input layers | [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) | commit `a393b157df42` (`references.toml`, every file with its SHA-256) <!-- TODO: replace with a release tag + DOI once the per-year goldens are released --> |
+| Reference outputs, lab scripts, input layers | [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) | commit `855dad434314` (`references.toml`, every file with its SHA-256) <!-- TODO: replace with a release tag + DOI once the per-year goldens are released --> |
 | Reference generator | [`terrame-docker`](https://github.com/LambdaGeo/terrame-docker) / `profsergiocosta/terrame-luccme` | TerraME 2.0.1 + LuccME 3.1, recorded in each golden's `manifest.json` |
 | Benchmark | this repository | `v0.1.0` <!-- TODO: DOI --> |
 
@@ -99,7 +102,7 @@ disslucc-benchmark/
 
 Pending:
 
-- Variants `lab01_md1643` and `lab15_md10` (the former headline numbers of the disslucc docs, with the convergence loop exercised): decide whether to regenerate them in `luccme-goldens` (`make run-labs-per-year LAB=15 MD=10`, needs Docker) or keep them as extra goldens.
+- Tag a `luccme-goldens` release with the per-year goldens (they are pinned by commit for now) and put its DOI in the badge and in section 6.
 - Next cheap labs: lab02 and lab07 (all components exist).
 - Not migrated from disslucc: the Lua differential tests, the discriminance tests and the Pontius & Millones metrics; they test the implementation rather than parity with a golden.
 - Remove `benchmark/` from disslucc and point its tests and docs here, once this benchmark is accepted.

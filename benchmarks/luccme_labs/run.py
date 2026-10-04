@@ -36,13 +36,16 @@ NUMBER_RE = re.compile(r"(?<![\w.])-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?")
 
 def provenance(name: str, spec: dict, scenario) -> list[str]:
     """Problems with the chain golden → manifest → Lua script → transcribed parameters."""
-    files, problems = ref.lab_files(scenario.lab), []
+    files, problems = ref.lab_files(scenario.golden_name, scenario.lab), []
     manifest = json.loads(files["manifest"].read_text())
     sha = hashlib.sha256(files["lua"].read_bytes()).hexdigest()
     if manifest["status"] != "ok":
         problems.append(f"golden status is {manifest['status']!r}")
     if manifest["source"]["sha256"] != sha:
         problems.append("the golden was generated from a different Lua script than the pinned one")
+    expected = {"maxDifference": scenario.max_difference} if scenario.max_difference is not None else {}
+    if (manifest.get("overrides") or {}) != expected:
+        problems.append(f"golden was generated with overrides {manifest.get('overrides')}, scenario expects {expected}")
     in_lua = {float(x) for x in NUMBER_RE.findall(files["lua"].read_text())}
     missing = sorted({v for v in scenario.declared if float(v) not in in_lua})
     if missing:
@@ -55,7 +58,7 @@ def terrame_log(path: Path) -> dict[int, tuple[int, float]]:
 
 
 def compare(name: str, spec: dict, scenario, result) -> dict:
-    files = ref.lab_files(scenario.lab)
+    files = ref.lab_files(scenario.golden_name, scenario.lab)
     manifest = json.loads(files["manifest"].read_text())
     golden = pd.read_csv(files["golden"]).set_index(["year", "row", "col"]).sort_index()
     years = sorted(golden.index.get_level_values("year").unique())
@@ -122,7 +125,7 @@ def render(results: list[dict]) -> str:
 
 
 def coverage() -> str:
-    covered = {name.split("/")[0] for name, s in LABS.items() if s.get("expect", "match") == "match"}
+    covered = {name.split("/")[0].split("_md")[0] for name, s in LABS.items() if s.get("expect", "match") == "match"}
     rows = ["| Lab | Paradigm | Components | disslucc components | Validated against goldens |", "| --- | --- | --- | --- | --- |"]
     for lab in CATALOG["lab"]:
         ok = lab["id"] in covered
@@ -165,7 +168,7 @@ def main() -> int:
         status = "differs (by design)" if expect == "differs" else ("match" if not failed else "FAIL: " + "; ".join(failed))
         if expect == "match" and failed:
             failures += 1
-        results.append({"name": name, "lab": scenario.lab, "spec": spec, "result": res, "status": status, "problems": problems})
+        results.append({"name": name, "lab": scenario.golden_name, "spec": spec, "result": res, "status": status, "problems": problems})
 
     header = (
         f"disslucc {version('disslucc')} · dissmodel {version('dissmodel')} · "

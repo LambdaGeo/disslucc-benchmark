@@ -31,13 +31,14 @@ def fetch(path: str) -> Path:
     return Path(_POOCH.fetch(path))
 
 
-def lab_files(lab: str) -> dict[str, Path]:
-    base = f"goldens/labs_per_year/{lab}"
+def lab_files(golden: str, lua: str | None = None) -> dict[str, Path]:
+    """Files of a golden (`lab03`, or a variant such as `lab01_md1643`) and the Lua script of its lab."""
+    base = f"goldens/labs_per_year/{golden}"
     return {
-        "golden": fetch(f"{base}/{lab}.csv.gz"),
+        "golden": fetch(f"{base}/{golden}.csv.gz"),
         "manifest": fetch(f"{base}/manifest.json"),
         "log": fetch(f"{base}/terrame.log"),
-        "lua": fetch(f"sources/labs/{lab}.lua"),
+        "lua": fetch(f"sources/labs/{lua or golden}.lua"),
     }
 
 

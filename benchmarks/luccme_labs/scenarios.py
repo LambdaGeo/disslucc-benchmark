@@ -45,9 +45,15 @@ class Run:
 
 @dataclass
 class Scenario:
-    lab: str                       # lab whose golden and Lua script are used
+    lab: str                       # lab whose Lua script the parameters come from
     run: Callable[[], Run]
     declared: list[float] = field(default_factory=list)  # numbers transcribed from the Lua
+    golden: str | None = None      # golden directory; defaults to `lab` (a variant: lab01_md1643)
+    max_difference: float | None = None  # `MD=` override the golden was generated with, if any
+
+    @property
+    def golden_name(self) -> str:
+        return self.golden or self.lab
 
 
 class _Recorder(Model):
@@ -111,8 +117,8 @@ LAB01_DRIVERS = ["assentamen", "uc_us", "uc_pi", "ti", "dist_riobr", "fertilidad
 _ALLOC_FLAGS = [(-1, 0, 1, 0, 1), (-1, 0, 1, 0, 1), (1, 0, 1, 0, 1)]  # static, minValue, maxValue, minChange, maxChange
 
 
-def lab01(cell_correction: bool) -> Run:
-    """PreComputedValues + CLinearRegression + CClueLike (maxDifference 5000)."""
+def lab01(cell_correction: bool, max_difference: float = 5000.0) -> Run:
+    """PreComputedValues + CLinearRegression + CClueLike (maxDifference 5000 in the lab script)."""
     cells = gpd.read_file(ref.layer("csAC"))
     backend, rows, cols = _grid(cells, CSAC_LUS + LAB01_DRIVERS)
     env = Environment(end_time=len(CSAC_YEARS) - 1)
@@ -134,7 +140,7 @@ def lab01(cell_correction: bool) -> Run:
         static={"f": -1, "d": -1, "outros": 1}, complementar_lu="f", cell_area=25.0,
         allocation_data=[AllocationSpec(static=s, min_value=a, max_value=b, min_change=c, max_change=d)
                          for s, a, b, c, d in _ALLOC_FLAGS],
-        max_difference=5000.0, cell_correction=cell_correction,
+        max_difference=max_difference, cell_correction=cell_correction,
     )
     rec = _Recorder(backend=backend, rows=rows, cols=cols, land_use_types=CSAC_LUS)
     env.run()
@@ -144,8 +150,9 @@ def lab01(cell_correction: bool) -> Run:
 LAB01_DECLARED = [
     *[v for row in CSAC_DEMAND for v in row],
     0.7392, -0.2193, 0.1754, 0.09708, 0.1207, 0.0000002388, -0.1313,
-    0.267, -0.0000009922, 0.2294, -0.09867, -0.0000003216, 0.1281, 5000.0, 25.0,
+    0.267, -0.0000009922, 0.2294, -0.09867, -0.0000003216, 0.1281, 25.0,
 ]
+LAB01_MAX_DIFFERENCE = 5000.0   # in lab01.lua; a variant overrides it (MD=) and says so in its manifest
 
 LAB03_SPECS = [
     SpatialLagRegressionSpec(const=0.05266679, ro=0.9124615,
@@ -236,12 +243,13 @@ LAB15_DECLARED = [
     -2.34187976925989, -0.0272710076327129, 4.30977432375496, 3.10319957497883, 0.445414024051873,
     47.3556329553235, 38.4966894254506, -0.100351497277102, 0.0581358851690861, -0.974998890251365,
     -2.51650696123426, -1.26742746441679, -40.3646901047482, -23.0841140199094, 0.6, 0.5, 0.01,
-    300.0, 1000.0, 0.0001, 1.0,
+    1000.0, 0.0001, 1.0,
 ]
+LAB15_MAX_DIFFERENCE = 300.0
 
 
-def lab15() -> Run:
-    """PreComputedValues + DLogisticRegression + DClueSLike (maxDifference 300)."""
+def lab15(max_difference: float = 300.0) -> Run:
+    """PreComputedValues + DLogisticRegression + DClueSLike (maxDifference 300 in the lab script)."""
     cells = gpd.read_file(ref.layer("cs_moju"))
     backend, rows, cols = _grid(cells, MOJU_LUS + MOJU_DRIVERS)
     env = Environment(end_time=len(MOJU_YEARS) - 1)
@@ -250,7 +258,7 @@ def lab15() -> Run:
     allocation = AllocationDClueSLike(
         backend=backend, demand=demand, land_use_types=MOJU_LUS,
         transition_matrix=[[[1, 1, 0], [0, 1, 0], [0, 0, 1]]],  # irreversible deforestation
-        cell_area=1.0, max_difference=300.0, max_iteration=1000, factor_iteration=0.0001,
+        cell_area=1.0, max_difference=max_difference, max_iteration=1000, factor_iteration=0.0001,
     )
     rec = _Recorder(backend=backend, rows=rows, cols=cols, land_use_types=MOJU_LUS)
     env.run()
@@ -259,9 +267,14 @@ def lab15() -> Run:
 
 SCENARIOS: dict[str, Scenario] = {
     # `cell_correction=False` is TerraME's behaviour (its correctCellChange never runs, a typo)
-    "lab01": Scenario("lab01", lambda: lab01(cell_correction=False), LAB01_DECLARED),
-    "lab01/cell_correction": Scenario("lab01", lambda: lab01(cell_correction=True), LAB01_DECLARED),
+    "lab01": Scenario("lab01", lambda: lab01(cell_correction=False), LAB01_DECLARED + [LAB01_MAX_DIFFERENCE]),
+    "lab01/cell_correction": Scenario("lab01", lambda: lab01(cell_correction=True), LAB01_DECLARED + [LAB01_MAX_DIFFERENCE]),
+    # variants: same lab script, `maxDifference` overridden (make run-labs-per-year LAB=01 MD=1643)
+    "lab01_md1643": Scenario("lab01", lambda: lab01(cell_correction=False, max_difference=1643.0), LAB01_DECLARED,
+                             golden="lab01_md1643", max_difference=1643.0),
     "lab03": Scenario("lab03", lambda: _saturation({}), LAB03_DECLARED),
     "lab06": Scenario("lab06", lambda: _saturation({2009: "csAC_2009"}), LAB03_DECLARED),
-    "lab15": Scenario("lab15", lab15, LAB15_DECLARED),
+    "lab15": Scenario("lab15", lab15, LAB15_DECLARED + [LAB15_MAX_DIFFERENCE]),
+    "lab15_md10": Scenario("lab15", lambda: lab15(max_difference=10.0), LAB15_DECLARED,
+                           golden="lab15_md10", max_difference=10.0),
 }
