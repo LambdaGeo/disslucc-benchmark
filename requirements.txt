@@ -1,0 +1,12 @@
+# Engine under test: disslucc, pinned to the commit the results were produced with
+# (pyproject version 0.4.0). Switch to a released version once the LuccME-BR components are on PyPI.
+disslucc @ git+https://github.com/DisSModel/disslucc.git@450f4db8e7b01ab24f508f2ec5d340ef5c5c7d6e
+
+# Reference download (SHA-256 verified) and analysis
+pooch>=1.8.0
+geopandas>=0.14.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Tests
+pytest>=7

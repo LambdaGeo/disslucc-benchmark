@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+# downloaded references (re-fetched and SHA-256 verified on demand) and generated reports
+.cache/
+reports/

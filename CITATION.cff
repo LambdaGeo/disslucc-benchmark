@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this benchmark suite, please cite it as below."
+type: software
+title: "disslucc-benchmark: Reproducible Validation of disslucc against the LuccME 3.1 Labs"
+abstract: "Benchmark that runs disslucc on the LuccME functional labs and compares it, year by year and cell by cell, with the TerraME 2.0.1 goldens of luccme-goldens, reporting how much of LuccME the Python implementation reproduces."
+version: 0.1.0
+license: MIT
+url: "https://github.com/LambdaGeo/disslucc-benchmark"
+repository-code: "https://github.com/LambdaGeo/disslucc-benchmark"
+keywords:
+  - "land-use change"
+  - "benchmarking"
+  - "reproducibility"
+  - "numerical parity"
+  - "TerraME"
+  - "LuccME"
+  - "disslucc"
+  - "open science"
+authors:
+  - family-names: Costa
+    given-names: Sérgio Souza
+    affiliation: "Universidade Federal do Maranhão (UFMA)"

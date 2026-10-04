@@ -1,0 +1,154 @@
+# The 21 LuccME 3.1 functional labs (luccme-goldens sources/labs/lab01.lua ... lab21.lua).
+# Components are read from each lab's Lua script, not from the README. `implemented` says whether
+# every component of the lab exists in disslucc (all | partial | none); a lab counts as validated
+# only when a scenario in labs.toml with expect = "match" compares it with its golden.
+
+[[lab]]
+id = "lab01"
+paradigm = "Continuous"
+components = "DemandPreComputed + PotentialCLinearRegression + AllocationCClueLike"
+implemented = "all"
+missing = ""
+
+[[lab]]
+id = "lab02"
+paradigm = "Continuous"
+components = "DemandPreComputed + PotentialCSpatialLagRegression + AllocationCClueLike"
+implemented = "all"
+missing = ""
+
+[[lab]]
+id = "lab03"
+paradigm = "Continuous"
+components = "DemandPreComputed + PotentialCSpatialLagRegression + AllocationCClueLikeSaturation"
+implemented = "all"
+missing = ""
+
+[[lab]]
+id = "lab04"
+paradigm = "Continuous"
+components = "DemandComputeTwoDates + PotentialCSpatialLagRegression + AllocationCClueLike"
+implemented = "partial"
+missing = "DemandComputeTwoDates"
+
+[[lab]]
+id = "lab05"
+paradigm = "Continuous"
+components = "DemandComputeThreeDates + PotentialCSpatialLagRegression + AllocationCClueLike"
+implemented = "partial"
+missing = "DemandComputeThreeDates"
+
+[[lab]]
+id = "lab06"
+paradigm = "Continuous"
+components = "DemandPreComputed + PotentialCSpatialLagRegression + AllocationCClueLikeSaturation"
+implemented = "all"
+missing = ""
+update_years = "2009"
+
+[[lab]]
+id = "lab07"
+paradigm = "Continuous"
+components = "DemandPreComputed + PotentialCSpatialLagRegression + AllocationCClueLike"
+implemented = "all"
+missing = ""
+update_years = "2009, 2020"
+
+[[lab]]
+id = "lab08"
+paradigm = "Continuous"
+components = "DemandPreComputed + PotentialCSpatialLagLinearRegressionMix + AllocationCClueLike"
+implemented = "partial"
+missing = "PotentialCSpatialLagLinearRegressionMix"
+
+[[lab]]
+id = "lab09"
+paradigm = "Continuous"
+components = "DemandPreComputed + PotentialCSampleBased + AllocationCClueLike"
+implemented = "partial"
+missing = "PotentialCSampleBased"
+
+[[lab]]
+id = "lab10"
+paradigm = "Discrete"
+components = "DemandPreComputed + PotentialDNeighSimpleRule + AllocationDSimpleOrdering"
+implemented = "partial"
+missing = "PotentialDNeighSimpleRule, AllocationDSimpleOrdering"
+
+[[lab]]
+id = "lab11"
+paradigm = "Discrete"
+components = "DemandPreComputed + PotentialDInverseDistanceRule + AllocationDSimpleOrdering"
+implemented = "partial"
+missing = "PotentialDInverseDistanceRule, AllocationDSimpleOrdering"
+
+[[lab]]
+id = "lab12"
+paradigm = "Discrete"
+components = "DemandPreComputed + PotentialDNeighInverseDistanceRule + AllocationDSimpleOrdering"
+implemented = "partial"
+missing = "PotentialDNeighInverseDistanceRule, AllocationDSimpleOrdering"
+
+[[lab]]
+id = "lab13"
+paradigm = "Discrete"
+components = "DemandPreComputed + PotentialDLogisticRegression + AllocationDSimpleOrdering"
+implemented = "partial"
+missing = "AllocationDSimpleOrdering"
+
+[[lab]]
+id = "lab14"
+paradigm = "Discrete"
+components = "DemandPreComputed + PotentialDLogisticRegressionNeighAttract + AllocationDClueSLike"
+implemented = "partial"
+missing = "PotentialDLogisticRegressionNeighAttract"
+
+[[lab]]
+id = "lab15"
+paradigm = "Discrete"
+components = "DemandPreComputed + PotentialDLogisticRegression + AllocationDClueSLike"
+implemented = "all"
+missing = ""
+
+[[lab]]
+id = "lab16"
+paradigm = "Discrete"
+components = "DemandComputeTwoDates + PotentialDLogisticRegression + AllocationDClueSLike"
+implemented = "partial"
+missing = "DemandComputeTwoDates"
+
+[[lab]]
+id = "lab17"
+paradigm = "Discrete"
+components = "DemandComputeThreeDates + PotentialDLogisticRegression + AllocationDClueSLike"
+implemented = "partial"
+missing = "DemandComputeThreeDates"
+
+[[lab]]
+id = "lab18"
+paradigm = "Discrete"
+components = "DemandPreComputed + PotentialDSampleBased + AllocationDClueSLike"
+implemented = "partial"
+missing = "PotentialDSampleBased"
+update_years = "2009"
+
+[[lab]]
+id = "lab19"
+paradigm = "Discrete"
+components = "DemandComputeTwoDates + PotentialDLogisticRegressionNeighAttractRepulsion + AllocationDClueSNeighOrdering"
+implemented = "none"
+missing = "DemandComputeTwoDates, PotentialDLogisticRegressionNeighAttractRepulsion, AllocationDClueSNeighOrdering"
+
+[[lab]]
+id = "lab20"
+paradigm = "Discrete"
+components = "DemandComputeTwoDates + PotentialDLogisticRegressionNeighAttractRepulsion + AllocationDClueSLike"
+implemented = "partial"
+missing = "DemandComputeTwoDates, PotentialDLogisticRegressionNeighAttractRepulsion"
+
+[[lab]]
+id = "lab21"
+paradigm = "Discrete"
+components = "DemandPreComputed + PotentialDLogisticRegression + AllocationDClueSNeighOrdering"
+implemented = "partial"
+missing = "AllocationDClueSNeighOrdering"

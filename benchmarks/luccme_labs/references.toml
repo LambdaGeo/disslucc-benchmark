@@ -1,0 +1,38 @@
+# Pinned references: files fetched from LambdaGeo/luccme-goldens at an exact commit.
+# Every file is verified by SHA-256 before use (see references.py).
+
+[source]
+repo = "LambdaGeo/luccme-goldens"
+commit = "a393b157df42bf1abe3a02804737731ec558428f"
+url = "https://raw.githubusercontent.com/LambdaGeo/luccme-goldens/{commit}/{path}"
+
+[files]
+"goldens/labs_per_year/lab01/lab01.csv.gz" = "35a3bbfc7b66a13cc3ada0cb78c3a989511dbaa317d01de72d230deff9637497"
+"goldens/labs_per_year/lab01/manifest.json" = "e39461b0d0af0409f23231bf0ab455a44261b6840f1f7b9de64370499a2106a2"
+"goldens/labs_per_year/lab01/terrame.log" = "402f3c5d01b6a4b6f44c539a3542c16286cd5186886b258429a80cde34630c5b"
+"sources/labs/lab01.lua" = "d8e16d718c3654b0d7f89d743413f3ee781d6fb05574231fb843af895c238dfa"
+"goldens/labs_per_year/lab03/lab03.csv.gz" = "d31a80152ab3969f2f6ddf0d1ecf20e72816605a5d5182d109b6cb9770ef1cd9"
+"goldens/labs_per_year/lab03/manifest.json" = "20f35cbb1409b86c00653ed0c77d9fe8808d844dc73b2608c742322af41dafdc"
+"goldens/labs_per_year/lab03/terrame.log" = "f4bbc9a456a91757f18d997bb1e42957450130d79b5a35e9a40940de461106cc"
+"sources/labs/lab03.lua" = "f32e13c853c05b0ea3df9368086e3ccc4fab8d3ba8322f39f15a7f056160a027"
+"goldens/labs_per_year/lab06/lab06.csv.gz" = "84a9b6d4b5a36d287c9250e7c923293752ec265d1965d61d505ab1df46be061c"
+"goldens/labs_per_year/lab06/manifest.json" = "5011dfb657154e546e7c79c8e69d31bc99086588fb8cc71ac3a6fced1f655cf4"
+"goldens/labs_per_year/lab06/terrame.log" = "27723b7e2e1bc65cb84d23b8bd50be7f8fff95b277f7d5867a4c6fad30274e59"
+"sources/labs/lab06.lua" = "1248ddfea1df91ef6bd07aea3ff325fc748e10107883c548d69ae35a20041b5b"
+"goldens/labs_per_year/lab15/lab15.csv.gz" = "0ac581cc89eb7d04b6e57c2f8ed9657833512eef64b9eef07ac4c380eb2b40c7"
+"goldens/labs_per_year/lab15/manifest.json" = "3d7ccae0360fc2e83692fe29e96d5de251fc41789bdab0c5521a4ea6e8819fd8"
+"goldens/labs_per_year/lab15/terrame.log" = "00909ea2eaa8fe88c302dd0b0b8d871b79b478e946cad130d6dd347085ee8cd7"
+"sources/labs/lab15.lua" = "bc9faf3a26aafa42c0075f114c0def46a1320e1f89ab52b7886b27ca72075bf7"
+"sources/labs/data/csAC.shp" = "c43ca9d839bb3e7b7c503b7e85212ab5a828f6e1710d57297dbf23afa4cbb2b1"
+"sources/labs/data/csAC.dbf" = "7992ebdc67fd66a59917c26a685a36448bf9c5dc4b885bbb8c9ce5e2d55b9f8e"
+"sources/labs/data/csAC.shx" = "2eba45b6f20dd3eec8a7e9d401e21a14a0ab49d93edd280af485a58b2426fc98"
+"sources/labs/data/csAC.prj" = "e908f36376343a9fc35faf56c02ce51c3c9d59b154f617f38992c092f2ee03e9"
+"sources/labs/data/csAC.cpg" = "6725e7bbcd28f3a8a586fa34bf191fd72dde8b61756932cd3237c17a6f196f1a"
+"sources/labs/data/csAC_2009.shp" = "dd00e453d039ffed7947a172f6d1bd5adefe422036e0e5874e04aceb0ec77441"
+"sources/labs/data/csAC_2009.dbf" = "f0c6f78d6bf199ea0e54f43cafc864aa9e44d8c518b9933b06e1aa5a879fccf4"
+"sources/labs/data/csAC_2009.shx" = "2eba45b6f20dd3eec8a7e9d401e21a14a0ab49d93edd280af485a58b2426fc98"
+"sources/labs/data/csAC_2009.prj" = "e908f36376343a9fc35faf56c02ce51c3c9d59b154f617f38992c092f2ee03e9"
+"sources/labs/data/cs_moju.shp" = "19fec700619036cfe9764339c974904647d2ea2f4342f95781b8a182e188c13b"
+"sources/labs/data/cs_moju.dbf" = "e525edd9b1d02d400862bd6f3e8d3af7f6ad3afe89a1b1738c6e4c2eff0857aa"
+"sources/labs/data/cs_moju.shx" = "8bcb68905d6e3d3a75847d1a00ff36d8a034e48691b6ecb62ae2eb859ec2033e"
+"sources/labs/data/cs_moju.prj" = "622ed9a970750e2421b6f6f6e4bc159edf2ae2ba95cb628ba328bf5443c65252"
