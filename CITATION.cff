@@ -20,4 +20,20 @@ keywords:
 authors:
   - family-names: Costa
     given-names: Sérgio Souza
+    orcid: "https://orcid.org/0000-0002-0232-4549"
     affiliation: "Universidade Federal do Maranhão (UFMA)"
+references:
+  - type: data
+    title: "luccme-goldens: Canonical Reference Execution Outputs for TerraME 2.0.1 and LuccME 3.1"
+    version: v1.1.0
+    doi: 10.5281/zenodo.23161342
+    authors:
+      - family-names: Costa
+        given-names: Sérgio Souza
+  - type: software
+    title: "terrame-docker: TerraME and LuccME in a Docker image"
+    version: 0.4.2
+    doi: 10.5281/zenodo.23160784
+    authors:
+      - family-names: Costa
+        given-names: Sérgio Souza

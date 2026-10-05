@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- `citation.yml`: validates `CITATION.cff` against the CFF 1.2.0 schema, exports it the way Zenodo
+  reads it, checks the ORCID checksum and that `date-released` is not in the future, and on a `v*`
+  tag that the version matches the tag.
+- `CITATION.cff`: author ORCID, and the references to `luccme-goldens` v1.1.0 and `terrame-docker` 0.4.2
+  (with their DOIs). The Zenodo record of 0.1.0 does not have them; the next release will.
+
 ## 0.1.0 (2026-10-04)
 
 First release.

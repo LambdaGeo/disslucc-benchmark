@@ -1,0 +1,84 @@
+name: Citation metadata
+
+# Validates CITATION.cff the same way Zenodo will read it, so a broken file
+# is caught in the PR instead of after the GitHub release (where the DOI
+# creation fails and the tag has to be redone).
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths: ["CITATION.cff", ".zenodo.json", ".github/workflows/citation.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  citation:
+    name: Validate CITATION.cff (Zenodo-ready)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install cffconvert
+
+      - name: Validate against CFF schema 1.2.0
+        run: cffconvert --validate -i CITATION.cff
+
+      - name: Export to Zenodo metadata (what the release will use)
+        run: cffconvert -f zenodo -i CITATION.cff | tee zenodo.json
+
+      - name: Check date and version consistency
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          python - <<'PY'
+          import datetime, json, os, sys
+          meta = json.load(open("zenodo.json"))
+          errors = []
+
+          # ORCID iDs must pass the ISO 7064 mod 11-2 checksum (Zenodo rejects
+          # a malformed iD, and the CFF schema alone does not catch it)
+          def orcid_ok(o):
+              d = o.replace("-", "")
+              if len(d) != 16 or not d[:15].isdigit():
+                  return False
+              t = 0
+              for c in d[:15]:
+                  t = (t + int(c)) * 2
+              r = (12 - t % 11) % 11
+              return d[15] == ("X" if r == 10 else str(r))
+
+          for c in meta.get("creators", []):
+              o = c.get("orcid")
+              if o and not orcid_ok(o):
+                  errors.append(f"invalid ORCID checksum for {c.get('name')}: {o}")
+
+          # date-released must be ISO and not in the future (UTC)
+          pub = datetime.date.fromisoformat(meta["publication_date"])
+          today = datetime.datetime.now(datetime.timezone.utc).date()
+          if pub > today:
+              errors.append(f"date-released {pub} is in the future (today UTC: {today})")
+
+          # on a tag push, CITATION.cff version must match the tag
+          if os.environ["REF_TYPE"] == "tag":
+              tag = os.environ["REF_NAME"].lstrip("v")
+              if meta["version"] != tag:
+                  errors.append(f"CITATION.cff version {meta['version']!r} != tag {tag!r}")
+              if pub != today:
+                  print(f"::warning::date-released {pub} differs from release date {today}")
+
+          for e in errors:
+              print(f"::error file=CITATION.cff::{e}")
+          sys.exit(1 if errors else 0)
+          PY
+
+      - name: Warn about DOI placeholders in README
+        run: |
+          if grep -nE "zenodo\.XXXXXXX|<!-- TODO" README.md; then
+            echo "::warning file=README.md::README still has DOI placeholders"
+          fi
