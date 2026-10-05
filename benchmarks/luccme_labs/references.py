@@ -1,7 +1,7 @@
 """Fetch the pinned references from luccme-goldens, verified by SHA-256.
 
 Nothing is stored in this repository: goldens, LuccME lab scripts and input layers are
-downloaded from one exact commit of LambdaGeo/luccme-goldens (see references.toml) into a
+downloaded from one exact release of LambdaGeo/luccme-goldens (see references.toml) into a
 local cache. A wrong or modified file fails here, before any metric is computed.
 """
 from __future__ import annotations
@@ -14,12 +14,14 @@ import pooch
 
 HERE = Path(__file__).resolve().parent
 SPEC = tomllib.loads((HERE / "references.toml").read_text())
+REF = SPEC["source"]["ref"]
 COMMIT = SPEC["source"]["commit"]
+DOI = SPEC["source"].get("doi")
 CACHE = Path(__import__("os").environ.get("DISSLUCC_BENCH_CACHE", HERE.parent.parent / ".cache" / "references"))
 
 _POOCH = pooch.create(
-    path=CACHE / COMMIT[:12],
-    base_url=SPEC["source"]["url"].replace("{commit}", COMMIT).replace("{path}", ""),
+    path=CACHE / REF,
+    base_url=SPEC["source"]["url"].replace("{ref}", REF).replace("{path}", ""),
     registry={path: f"sha256:{digest}" for path, digest in SPEC["files"].items()},
 )
 

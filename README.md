@@ -2,14 +2,14 @@
 
 [![CI](https://github.com/LambdaGeo/disslucc-benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/LambdaGeo/disslucc-benchmark/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Goldens: Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23107748.svg)](https://doi.org/10.5281/zenodo.23107748) <!-- TODO: DOI of the luccme-goldens release that includes the per-year goldens (v1.0.0 has only the last-year ones) -->
+[![luccme-goldens v1.1.0: Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23161342.svg)](https://doi.org/10.5281/zenodo.23161342)
 [![Engine: disslucc](https://img.shields.io/badge/Engine-disslucc-green.svg)](https://github.com/DisSModel/disslucc)
 
 **How much of LuccME does disslucc implement? This repository measures it, lab by lab, against TerraME reference outputs.**
 
 It runs `disslucc` on the LuccME 3.1 functional labs and compares, for every cell and every simulated year, land use (`<lu>_out`), potential (`<lu>_pot`), the number of iterations of the allocation's convergence loop and, where the lab reports it, the maximum error against the demand, with the goldens that TerraME 2.0.1 produced. No TerraME installation is needed.
 
-No reference data is stored here. Goldens, lab scripts and input layers are downloaded from one exact commit of [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) and verified by SHA-256 before use.
+No reference data is stored here. Goldens, lab scripts and input layers are downloaded from one exact release of [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) (`v1.1.0`) and verified by SHA-256 before use.
 
 ---
 
@@ -20,6 +20,7 @@ git clone https://github.com/LambdaGeo/disslucc-benchmark && cd disslucc-benchma
 make install        # disslucc (pinned commit) + dependencies
 make benchmark      # downloads the references (~20 MB, once), runs, prints the table; exit 1 if a criterion is missed
 make coverage       # which of the 21 labs disslucc covers
+make timing         # time and peak memory of each scenario (informational)
 make benchmark LAB=lab03   # one scenario
 ```
 
@@ -38,7 +39,7 @@ The thresholds are **regression guards**, set just above what was measured, not 
 
 ## 3. Results
 
-disslucc `450f4db` (0.4.0) · dissmodel 0.6.5 · goldens: `luccme-goldens` @ `855dad434314` (TerraME 2.0.1 + LuccME 3.1).
+disslucc `450f4db` (0.4.0) · dissmodel 0.6.5 · goldens: `luccme-goldens` `v1.1.0` (TerraME 2.0.1 + LuccME 3.1).
 
 | Scenario | Components | Cells | Years | Iterations vs TerraME | MAE (worst column) | Max abs error | Criterion | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -73,28 +74,43 @@ In `lab01_md1643/cell_correction` the 2014 MAE is **0.0036** in `f` and in `d` (
 - **The variants are the same lab with `MD=` overriding `maxDifference`.** The golden's manifest records the override and the benchmark checks it against the scenario. They reproduce, to 1e-12, the copies kept in the disslucc repository, which came from the original scripts (`lab1_main.lua` and `lab6_main.lua`).
 - **lab15 (package) is nearly non-discriminative.** With `maxDifference` 300 a static ranking by `prob_d − prob_f` already reproduces its output; the match shows the regression coefficients were transcribed correctly. `lab15_md10` is the one that exercises CLUE-S.
 - **lab03 and lab06 do not reach `correctCellChange` nor saturation** (`changeLimiarValue = 1`). Those branches are checked against the original Lua on synthetic cases in the disslucc repository (`tests/test_lua_differential.py`), which are not part of this benchmark.
+- **The scenarios do not exercise the executor or the rasterization.** They build each lab's model by hand and match cells by their own `row`/`col`; the executor and TOML path that a user runs rasterizes the layer at a `resolution` and, for `cs_moju`, loses cells (5,842 of 5,914 in the lab15 example), so it cannot be compared cell by cell with a TerraME golden.
 - This is **engineering validation** (same results as a reference run), not scientific validation against observed data.
 
-## 6. Reproducibility chain
+## 6. Timing (informational)
+
+```bash
+make timing REPS=5            # LAB=lab03 for one scenario
+```
+
+Each scenario runs in a fresh process, one warm-up repetition and `REPS` measured ones. The timed span is the whole scenario (reading the layers, building the model, simulating every year, recording each year's state); importing disslucc is not timed. `reports/timing_disslucc.json` gets the median, range, peak memory and a description of the machine. **Nothing here passes or fails**: times depend on the machine and on CI load.
+
+Next to it the report shows the `Elapsed time` that TerraME printed in the golden's `terrame.log`. Read it as an order of magnitude, **not as a speed ratio**: it is a single run, at 1-second resolution, measured inside Docker on another machine, and it also includes the recorder that wrote every year's snapshot. `luccme-goldens` has a controlled TerraME measurement (repetitions, fixed CPU and memory limits, environment recorded) only for the `fill` datasets of [disscube-benchmark](https://github.com/LambdaGeo/disscube-benchmark); if one is added for the labs, this report can pin it the same way.
+
+The scenarios call the disslucc models directly and **do not go through the executor** of dissmodel, so the per-phase times (`time_load_sec`, `time_run_sec`) that its lifecycle records are not available here.
+
+## 7. Reproducibility chain
 
 | Level | Artifact | Pinned version |
 | --- | --- | --- |
 | Engine | [`disslucc`](https://github.com/DisSModel/disslucc) | commit `450f4db` (`requirements.txt`) |
-| Reference outputs, lab scripts, input layers | [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) | commit `855dad434314` (`references.toml`, every file with its SHA-256) <!-- TODO: replace with a release tag + DOI once the per-year goldens are released --> |
+| Reference outputs, lab scripts, input layers | [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) | `v1.1.0`, DOI [10.5281/zenodo.23161342](https://doi.org/10.5281/zenodo.23161342) (`references.toml`, every file with its SHA-256) |
 | Reference generator | [`terrame-docker`](https://github.com/LambdaGeo/terrame-docker) / `profsergiocosta/terrame-luccme` | TerraME 2.0.1 + LuccME 3.1, recorded in each golden's `manifest.json` |
-| Benchmark | this repository | `v0.1.0` <!-- TODO: DOI --> |
+| Benchmark | this repository | `v0.1.0` (no DOI yet; see `CITATION.cff` for how to cite) |
 
-To use another version of the goldens, change `commit` in `references.toml` and regenerate the hashes; a modified file fails with a hash mismatch.
+To use another version of the goldens: `make pins REF=<tag> GOLDENS=../luccme-goldens [DOI=...]`. It rewrites `references.toml` with the hashes read from `git show <ref>:<path>`, so nothing is copied by hand; a modified file fails with a hash mismatch.
 
-## 7. Repository structure and what is still pending
+## 8. Repository structure and what is still pending
 
 ```text
 disslucc-benchmark/
 ├── Makefile                      # install, benchmark, coverage, references, test
 ├── requirements.txt              # disslucc pinned by commit
 ├── benchmarks/luccme_labs/
-│   ├── references.toml           # luccme-goldens commit + SHA-256 of every file used
+│   ├── references.toml           # luccme-goldens release + SHA-256 of every file used
 │   ├── references.py             # download + hash check (pooch)
+│   ├── pin_references.py         # re-pin to another luccme-goldens ref (make pins)
+│   ├── timing.py                 # time and peak memory, informational (make timing)
 │   ├── scenarios.py              # the labs, as disslucc models (parameters from the Lua)
 │   ├── labs.toml                 # criteria per scenario (match | differs)
 │   ├── catalog.toml              # the 21 labs and their components, from the Lua
@@ -105,11 +121,11 @@ disslucc-benchmark/
 
 Pending:
 
-- Tag a `luccme-goldens` release with the per-year goldens (they are pinned by commit for now) and put its DOI in the badge and in section 6.
+- Archive this repository's own release on Zenodo and add its DOI to `CITATION.cff`.
 - Next cheap labs: lab02 and lab07 (all components exist).
 - Not migrated from disslucc: the Lua differential tests, the discriminance tests and the Pontius & Millones metrics; they test the implementation rather than parity with a golden.
 - Remove `benchmark/` from disslucc and point its tests and docs here, once this benchmark is accepted.
 
-## 8. Citation
+## 9. Citation
 
 See `CITATION.cff`. Upstream TerraME and LuccME are Copyright (C) 2001–2017 INPE and TerraLAB/UFOP.

@@ -172,14 +172,14 @@ def main() -> int:
 
     header = (
         f"disslucc {version('disslucc')} · dissmodel {version('dissmodel')} · "
-        f"goldens: luccme-goldens @ {ref.COMMIT[:12]} (TerraME 2.0.1 + LuccME 3.1)"
+        f"goldens: luccme-goldens {ref.REF} ({ref.COMMIT[:7]}) (TerraME 2.0.1 + LuccME 3.1)"
     )
     table = render(results)
     print(f"\n{header}\n\n{table}")
     report_dir = Path(args.report_dir)
     report_dir.mkdir(parents=True, exist_ok=True)
     (report_dir / "luccme_labs.json").write_text(json.dumps(
-        {"disslucc": version("disslucc"), "dissmodel": version("dissmodel"), "goldens_commit": ref.COMMIT,
+        {"disslucc": version("disslucc"), "dissmodel": version("dissmodel"), "goldens_ref": ref.REF, "goldens_commit": ref.COMMIT, "goldens_doi": ref.DOI,
          "scenarios": [{k: v for k, v in r.items() if k != "spec"} | {"spec": r["spec"]} for r in results]}, indent=2))
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a").write(f"### {header}\n\n{table}\n")

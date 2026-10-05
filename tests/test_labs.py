@@ -50,3 +50,26 @@ def test_wrong_override_fails_provenance():
     scenario = SCENARIOS["lab01_md1643"]
     broken = type(scenario)(scenario.lab, scenario.run, scenario.declared, scenario.golden, 5000.0)
     assert any("overrides" in p for p in bench.provenance("lab01_md1643", {}, broken))
+
+
+# ── pins and timing ──────────────────────────────────────────────────────────────────────────
+
+def test_references_are_pinned_to_a_release():
+    import references as ref
+    assert ref.REF.startswith("v") and len(ref.COMMIT) == 40 and ref.DOI
+
+
+def test_terrame_elapsed_time_is_read_from_the_golden_log():
+    import timing
+    assert timing.terrame_elapsed_s("lab15") == 2
+    assert timing.terrame_elapsed_s("lab15_md10", "lab15") == 9
+
+
+def test_timing_report(tmp_path):
+    import json
+    import subprocess
+    out = tmp_path / "timing.json"
+    subprocess.run([sys.executable, str(Path(bench.__file__).parent / "timing.py"), "lab15", "--reps", "1", "--out", str(out)],
+                   check=True, capture_output=True)
+    rep = json.loads(out.read_text())["scenarios"]["lab15"]
+    assert rep["reps"] == 1 and rep["run_s"]["median"] > 0 and rep["max_rss_mb"] > 0 and rep["terrame_elapsed_s"] == 2
