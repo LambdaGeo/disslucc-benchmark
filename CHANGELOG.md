@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Scenarios `lab02` and `lab07`: the spatial-lag potential of lab03 with the plain CClueLike allocation
+  (lab07 to 2025, with the 2009 and 2020 driver updates). Both reproduce TerraME with components that
+  already existed in disslucc, iterations identical, max abs error 2.3e-06 and 3.0e-06. Validated labs: 6 of 21.
+
 - `citation.yml`: validates `CITATION.cff` against the CFF 1.2.0 schema, exports it the way Zenodo
   reads it, checks the ORCID checksum and that `date-released` is not in the future, and on a `v*`
   tag that the version matches the tag.

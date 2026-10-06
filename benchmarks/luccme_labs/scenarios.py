@@ -170,10 +170,11 @@ LAB03_DECLARED = [
 ]
 
 
-def _saturation(updates: dict[int, str]) -> Run:
-    """PreComputedValues + CSpatialLagRegression + CClueLikeSaturation (maxDifference 1643).
-    `updates` maps a year to the layer whose columns replace the drivers from that year
-    (LuccME's updateYears)."""
+def _spatial_lag(updates: dict[int, str], *, saturation: bool, years: list[int], demand_rows: list[list[float]],
+                 max_difference: float) -> Run:
+    """PreComputedValues + CSpatialLagRegression + CClueLikeSaturation (saturation=True: lab03, lab06)
+    or CClueLike (lab02, lab07). `updates` maps a year to the layer whose columns replace the
+    drivers from that year (LuccME's updateYears)."""
     cells = gpd.read_file(ref.layer("csAC"))
     rows, cols = cells["row"].astype(int).values, cells["col"].astype(int).values
     drivers_used = sorted({d for s in LAB03_SPECS for d in s.betas})
@@ -186,7 +187,7 @@ def _saturation(updates: dict[int, str]) -> Run:
         the columns of the <layer>_<year> file into the cells *by position* (forEachCellPair)."""
 
         def execute(self):
-            year = CSAC_YEARS[0] + int(self.env.now())
+            year = years[0] + int(self.env.now())
             current = cells.copy()
             for upd_year in sorted(new_layers):
                 if year >= upd_year:
@@ -203,24 +204,54 @@ def _saturation(updates: dict[int, str]) -> Run:
     order[rows, cols] = np.arange(len(cells), dtype=np.float64)
     backend.set("order", order)
 
-    env = Environment(end_time=len(CSAC_YEARS) - 1)
+    env = Environment(end_time=len(years) - 1)
     Updates()
-    demand = DemandPreComputedValues(annual_demand=CSAC_DEMAND, land_use_types=CSAC_LUS)
+    demand = DemandPreComputedValues(annual_demand=demand_rows, land_use_types=CSAC_LUS)
     potential = PotentialSpatialLagRegression(
         backend=backend, potential_data=[copy.deepcopy(LAB03_SPECS)], demand=demand,  # deepcopy: the component writes the adapted const back
         land_use_types=CSAC_LUS, land_use_no_data="outros",
     )
-    allocation = AllocationClueLikeSaturation(
-        backend=backend, demand=demand, potential=potential, land_use_types=CSAC_LUS,
-        allocation_data=[[SaturationAllocationSpec(static=s, min_value=a, max_value=b, min_change=c, max_change=d)
-                          for s, a, b, c, d in _ALLOC_FLAGS]],
-        complementar_lu="f", cell_area=25, land_use_no_data="outros", attr_protection="uc_pi",
-        max_difference=1643, max_iteration=1000, initial_elasticity=0.1, min_elasticity=0.001,
-        max_elasticity=1.5, order_attr="order",
-    )
+    if saturation:
+        allocation = AllocationClueLikeSaturation(
+            backend=backend, demand=demand, potential=potential, land_use_types=CSAC_LUS,
+            allocation_data=[[SaturationAllocationSpec(static=s, min_value=a, max_value=b, min_change=c, max_change=d)
+                              for s, a, b, c, d in _ALLOC_FLAGS]],
+            complementar_lu="f", cell_area=25, land_use_no_data="outros", attr_protection="uc_pi",
+            max_difference=max_difference, max_iteration=1000, initial_elasticity=0.1, min_elasticity=0.001,
+            max_elasticity=1.5, order_attr="order",
+        )
+    else:
+        # as lab01: TerraME never runs correctCellChange, so it is switched off to reproduce it
+        allocation = AllocationClueLike(
+            backend=backend, demand=demand, potential=potential, land_use_types=CSAC_LUS,
+            static={"f": -1, "d": -1, "outros": 1}, complementar_lu="f", cell_area=25.0,
+            allocation_data=[AllocationSpec(static=s, min_value=a, max_value=b, min_change=c, max_change=d)
+                             for s, a, b, c, d in _ALLOC_FLAGS],
+            max_difference=max_difference, cell_correction=False,
+        )
     rec = _Recorder(backend=backend, rows=rows, cols=cols, land_use_types=CSAC_LUS)
     env.run()
-    return _finish(allocation, rec, CSAC_YEARS)
+    return _finish(allocation, rec, years)
+
+
+# lab02 / lab07: the spatial-lag potential of lab03 with the plain CClueLike allocation.
+# lab07 runs to 2025 (demand to 2025), updates the drivers in 2009 and, with its scenario, in 2020.
+LAB07_YEARS = list(range(2008, 2026))
+LAB07_DEMAND = CSAC_DEMAND[:-1] + [
+    [136253.413, 21607.38493, 6489.202049], [135973.413, 21887.38493, 6489.202049],
+    [135693.413, 22167.38493, 6489.202049], [135413.413, 22447.38493, 6489.202049],
+    [135133.413, 22727.38493, 6489.202049], [134853.413, 23007.38493, 6489.202049],
+    [134573.413, 23287.38493, 6489.202049], [134293.413, 23567.38493, 6489.202049],
+    [133993.413, 23867.38493, 6489.202049], [133693.413, 24167.38493, 6489.202049],
+    [133393.413, 24467.38493, 6489.202049], [133093.413, 24767.38493, 6489.202049],
+]
+_SPEC_NUMBERS = [
+    0.05266679, 0.9124615, 0.03789872, 0.04141921, 0.04455667,
+    0.01431553, 0.9019253, 0.0443537, -0.01454847, 0.01701601, -0.00000002262071,
+]
+_ALLOC_COMMON = [1000.0, 0.1, 0.001, 1.5, 25.0]   # maxIteration, elasticities, cell area
+LAB02_DECLARED = [*[v for row in CSAC_DEMAND for v in row], *_SPEC_NUMBERS, 1643.0, *_ALLOC_COMMON]
+LAB07_DECLARED = [*[v for row in LAB07_DEMAND for v in row], *_SPEC_NUMBERS, 2000.0, *_ALLOC_COMMON]
 
 
 # ── cs_moju lab (discrete, 1999-2004): lab15 ─────────────────────────────────────────────────
@@ -272,8 +303,15 @@ SCENARIOS: dict[str, Scenario] = {
     # variants: same lab script, `maxDifference` overridden (make run-labs-per-year LAB=01 MD=1643)
     "lab01_md1643": Scenario("lab01", lambda: lab01(cell_correction=False, max_difference=1643.0), LAB01_DECLARED,
                              golden="lab01_md1643", max_difference=1643.0),
-    "lab03": Scenario("lab03", lambda: _saturation({}), LAB03_DECLARED),
-    "lab06": Scenario("lab06", lambda: _saturation({2009: "csAC_2009"}), LAB03_DECLARED),
+    "lab02": Scenario("lab02", lambda: _spatial_lag({}, saturation=False, years=CSAC_YEARS, demand_rows=CSAC_DEMAND,
+                                                    max_difference=1643.0), LAB02_DECLARED),
+    "lab03": Scenario("lab03", lambda: _spatial_lag({}, saturation=True, years=CSAC_YEARS, demand_rows=CSAC_DEMAND,
+                                                    max_difference=1643), LAB03_DECLARED),
+    "lab06": Scenario("lab06", lambda: _spatial_lag({2009: "csAC_2009"}, saturation=True, years=CSAC_YEARS,
+                                                    demand_rows=CSAC_DEMAND, max_difference=1643), LAB03_DECLARED),
+    "lab07": Scenario("lab07", lambda: _spatial_lag({2009: "csAC_2009", 2020: "csAC_cenarioA_2020"}, saturation=False,
+                                                    years=LAB07_YEARS, demand_rows=LAB07_DEMAND, max_difference=2000.0),
+                      LAB07_DECLARED),
     # disslucc's default (cell_correction=True) against the same golden: where the 0.0036 MAE of
     # docs/validation.md comes from. Reported only: TerraME never runs correctCellChange.
     "lab01_md1643/cell_correction": Scenario("lab01", lambda: lab01(cell_correction=True, max_difference=1643.0), LAB01_DECLARED,
