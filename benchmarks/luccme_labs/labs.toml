@@ -6,7 +6,7 @@
 #   expect = "differs"     reported only; used where the two differ by construction
 #
 # Thresholds are regression guards set just above what was measured (see README, section 4):
-# float32 backends (lab01, lab15) leave ~1e-7 of noise; the float64 labs agree to the 12
+# float32 paths (lab01, lab15, and the CClueLike labs lab02 and lab07) leave 1e-7 to 3e-6 of noise; the float64 labs agree to the 12
 # decimals the goldens keep (5e-13).
 
 [lab01]
@@ -20,6 +20,12 @@ max_abs_error = 1e-6
 expect = "differs"
 iterations = "exact"
 
+[lab02]
+# lab03's spatial-lag potential with the plain CClueLike allocation (maxDifference 1643).
+expect = "match"
+iterations = "exact"
+max_abs_error = 1e-5
+
 [lab03]
 expect = "match"
 iterations = "exact"
@@ -31,6 +37,12 @@ expect = "match"
 iterations = "exact"
 max_abs_error = 1e-9
 max_error_rel = 1e-9
+
+[lab07]
+# lab02 to 2025: drivers updated in 2009 and, with the scenario, in 2020 (csAC_cenarioA_2020).
+expect = "match"
+iterations = "exact"
+max_abs_error = 1e-5
 
 [lab15]
 expect = "match"

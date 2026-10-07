@@ -44,15 +44,17 @@ disslucc `450f4db` (0.4.0) · dissmodel 0.6.5 · goldens: `luccme-goldens` `v1.1
 | Scenario | Components | Cells | Years | Iterations vs TerraME | MAE (worst column) | Max abs error | Criterion | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `lab01` | PreComputed + CLinearRegression + CClueLike (`maxDifference` 5000) | 6,574 | 2008–2014 | identical | 3.0e-08 | 5.1e-07 | iterations exact, max ≤ 1e-6 | match |
+| `lab02` | PreComputed + CSpatialLagRegression + CClueLike (1643) | 6,574 | 2008–2014 | identical | 1.5e-08 | 2.3e-06 | iterations exact, max ≤ 1e-5 | match |
 | `lab03` | PreComputed + CSpatialLagRegression + CClueLikeSaturation (1643) | 6,574 | 2008–2014 | identical | 2.3e-13 | 5.0e-13 | iterations exact, max ≤ 1e-9, log max error rel ≤ 1e-9 | match |
 | `lab06` | same as lab03 + `updateYears = {2009}` (`ti` from `csAC_2009`) | 6,574 | 2008–2014 | identical | 2.3e-13 | 5.0e-13 | same as lab03 | match |
+| `lab07` | same as lab02 to 2025, `updateYears = {2009, 2020}` (`ti` from `csAC_2009`; `uc_us`, `uc_pi` from `csAC_cenarioA_2020`) | 6,574 | 2008–2025 | identical | 1.7e-08 | 3.0e-06 | iterations exact, max ≤ 1e-5 | match |
 | `lab15` | PreComputed + DLogisticRegression + DClueSLike (300) | 5,914 | 1999–2004 | identical | 3.0e-08 | 1.2e-07 | iterations exact, max ≤ 1e-6 | match |
 | `lab01_md1643` | `lab01` with `maxDifference` 1643 (`MD=1643`): the convergence loop runs, **0,0,8,26,18,17,17** iterations per year | 6,574 | 2008–2014 | identical | 3.0e-08 | 5.1e-07 | iterations exact, max ≤ 1e-6 | match |
 | `lab15_md10` | `lab15` with `maxDifference` 10 (`MD=10`): **0,67,56,56,61,61** iterations per year | 5,914 | 1999–2004 | identical | 3.0e-08 | 1.2e-07 | iterations exact, max ≤ 1e-6 | match |
 | `lab01_md1643/cell_correction` | `lab01_md1643` with disslucc's default: **0,0,0,14,17,16,16** iterations per year (TerraME: 0,0,8,26,18,17,17) | 6,574 | 2008–2014 | differ | 2.6e-03 | 2.7e-02 | reported only | differs (by design) |
 | `lab01/cell_correction` | `lab01` with disslucc's default | 6,574 | 2008–2014 | identical | 1.4e-03 | 3.9e-02 | reported only | differs (by design) |
 
-The 5e-13 of lab03/lab06 is the precision of the goldens (12 decimals). The ~1e-7 of lab01/lab15 is float32 noise of the raster backend.
+The 5e-13 of lab03/lab06 is the precision of the goldens (12 decimals). The 1e-7 of lab01/lab15 and the up to 3e-6 of lab02/lab07 (almost all in the `f` potential) are float32 noise of the raster backend and of the CClueLike path.
 
 ### Where disslucc differs from LuccME on purpose
 
@@ -64,13 +66,13 @@ In `lab01_md1643/cell_correction` the 2014 MAE is **0.0036** in `f` and in `d` (
 
 `make coverage` prints the table; the source is `benchmarks/luccme_labs/catalog.toml`, read from each lab's Lua script.
 
-**Validated: 4 of 21 labs** (lab01, lab03, lab06, lab15), plus two `maxDifference` variants that exercise the convergence loop. **All components implemented in disslucc: 6 of 21**: the four above plus lab02 and lab07, which have no scenario yet. Missing components, by lab, are in the `missing` field of the catalog (`DemandComputeTwoDates`/`ThreeDates`, `AllocationDSimpleOrdering`, the neighbourhood-based discrete potentials, `AllocationDClueSNeighOrdering`, the sample-based potentials and `PotentialCSpatialLagLinearRegressionMix`).
+**Validated: 6 of 21 labs** (lab01, lab02, lab03, lab06, lab07, lab15), plus two `maxDifference` variants that exercise the convergence loop. **All components implemented in disslucc: 6 of 21**: exactly those six, so no remaining lab can be validated with the components that exist today. Labs missing a single component: lab04, lab05, lab16 and lab17 (`DemandComputeTwoDates`/`ThreeDates`), and lab08, lab09, lab13, lab14, lab18 and lab21 (one potential or allocation each). The missing components of every lab are in the `missing` field of the catalog.
 
 > `catalog.toml` differs from the table in the `luccme-goldens` README in some labs (for example lab09 and lab13). The catalog follows the Lua scripts, which are what TerraME ran.
 
 ## 5. Limits of this evidence
 
-- **The package labs barely exercise the convergence loop.** In lab01, lab03, lab06 and lab15 the allocation is accepted at the first pass every year (iterations are `0`), so "iterations identical" says little there. That is why the two variants exist: with a smaller `maxDifference` the loop runs 8 to 67 times per year, and disslucc reproduces TerraME's iteration count in every year.
+- **The package labs barely exercise the convergence loop.** In lab01, lab02, lab03, lab06, lab07 and lab15 the allocation is accepted at the first pass every year (iterations are `0`), so "iterations identical" says little there. That is why the two variants exist: with a smaller `maxDifference` the loop runs 8 to 67 times per year, and disslucc reproduces TerraME's iteration count in every year.
 - **The variants are the same lab with `MD=` overriding `maxDifference`.** The golden's manifest records the override and the benchmark checks it against the scenario. They reproduce, to 1e-12, the copies kept in the disslucc repository, which came from the original scripts (`lab1_main.lua` and `lab6_main.lua`).
 - **lab15 (package) is nearly non-discriminative.** With `maxDifference` 300 a static ranking by `prob_d − prob_f` already reproduces its output; the match shows the regression coefficients were transcribed correctly. `lab15_md10` is the one that exercises CLUE-S.
 - **lab03 and lab06 do not reach `correctCellChange` nor saturation** (`changeLimiarValue = 1`). Those branches are checked against the original Lua on synthetic cases in the disslucc repository (`tests/test_lua_differential.py`), which are not part of this benchmark.
@@ -122,7 +124,7 @@ disslucc-benchmark/
 Pending:
 
 - Archive this repository's own release on Zenodo and add its DOI to `CITATION.cff`.
-- Next cheap labs: lab02 and lab07 (all components exist).
+- Next labs: those missing a single component (section 4), starting with the demand ones (lab04, lab05, lab16, lab17).
 - Not migrated from disslucc: the Lua differential tests, the discriminance tests and the Pontius & Millones metrics; they test the implementation rather than parity with a golden.
 - Remove `benchmark/` from disslucc and point its tests and docs here, once this benchmark is accepted.
 
