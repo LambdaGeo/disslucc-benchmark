@@ -26,6 +26,20 @@ _POOCH = pooch.create(
 )
 
 
+_LUA = SPEC.get("lua_source", {})
+_LUA_POOCH = pooch.create(
+    path=CACHE / "terrame-docker" / _LUA.get("ref", "none"),
+    base_url=_LUA.get("url", "").replace("{ref}", _LUA.get("ref", "")).replace("{path}", ""),
+    registry={path: f"sha256:{digest}" for path, digest in SPEC.get("lua_files", {}).items()},
+)
+
+
+def lua_component(name: str) -> Path:
+    """A LuccME Lua component (e.g. `AllocationCClueLikeSaturation.lua`) from the reference image's
+    source tree (terrame-docker, `[lua_source]` in references.toml), hash-checked every time."""
+    return Path(_LUA_POOCH.fetch(f"luccme/lua/{name}"))
+
+
 def fetch(path: str) -> Path:
     """Local path of a pinned file (downloaded on first use, hash-checked every time)."""
     if path not in SPEC["files"]:

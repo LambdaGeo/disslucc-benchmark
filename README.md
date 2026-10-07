@@ -102,6 +102,7 @@ The scenarios call the disslucc models directly and **do not go through the exec
 | --- | --- | --- |
 | Engine | [`disslucc`](https://github.com/DisSModel/disslucc) | commit `3e32384` (`requirements.txt`) |
 | Reference outputs, lab scripts, input layers | [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) | `v1.1.0`, DOI [10.5281/zenodo.23161342](https://doi.org/10.5281/zenodo.23161342) (`references.toml`, every file with its SHA-256) |
+| Lua components (differential test) | [`terrame-docker`](https://github.com/profsergiocosta/terrame-docker) | `v0.4.2`, DOI [10.5281/zenodo.23160784](https://doi.org/10.5281/zenodo.23160784) (`[lua_files]` in `references.toml`, SHA-256) |
 | Reference generator | [`terrame-docker`](https://github.com/LambdaGeo/terrame-docker) / `profsergiocosta/terrame-luccme` | TerraME 2.0.1 + LuccME 3.1, recorded in each golden's `manifest.json` |
 | Benchmark | this repository | `v0.1.0` (no DOI yet; see `CITATION.cff` for how to cite) |
 
@@ -123,6 +124,7 @@ disslucc-benchmark/
 │   ├── catalog.toml              # the 21 labs and their components, from the Lua
 │   └── run.py                    # run, compare, provenance checks, tables
 ├── tests/test_labs.py            # pytest wrapper
+├── tests/test_lua_differential.py # the Python ports against the original LuccME Lua (lupa)
 └── .github/workflows/ci.yml      # runs on push, PR and weekly
 ```
 
@@ -130,7 +132,7 @@ Pending:
 
 - Archive this repository's own release on Zenodo and add its DOI to `CITATION.cff`.
 - Next labs: those missing a single component (section 4).
-- Not migrated from disslucc: the Lua differential tests, the discriminance tests and the Pontius & Millones metrics; they test the implementation rather than parity with a golden.
+- Not migrated from disslucc: the discriminance tests and the Pontius & Millones metrics; they test the implementation rather than parity with a golden. (The finding of the lab15 test is recorded in section 5.)
 - Remove `benchmark/` from disslucc and point its tests and docs here, once this benchmark is accepted.
 
 ## 9. Citation

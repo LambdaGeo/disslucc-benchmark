@@ -7,6 +7,12 @@
   counts; max abs error 2.4e-06, 2.3e-06, 1.2e-07 and 1.2e-07. Validated labs: 10 of 21. Requires disslucc
   `3e32384` or later; `requirements.txt` is pinned to it. Their reference files are pinned in `references.toml`
   (hashes read from the `v1.1.0` tag).
+- `tests/test_lua_differential.py` (35 tests), moved from disslucc: the Python ports of the saturation
+  allocation and the spatial-lag potential against the original LuccME Lua components, run through
+  `lupa` on synthetic cases that reach what the goldens never do (`correctCellChange`, the saturation
+  branch, log-transformed classes). The Lua files are not copied: they are downloaded from
+  `terrame-docker` v0.4.2 and SHA-256-checked (`[lua_source]` and `[lua_files]` in `references.toml`).
+  `requirements.txt` adds `lupa`.
 - Wording: the LuccME guard that never runs `correctCellChange` is described as a field-name mismatch.
 
 - Scenarios `lab02` and `lab07`: the spatial-lag potential of lab03 with the plain CClueLike allocation

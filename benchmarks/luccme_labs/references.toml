@@ -73,3 +73,17 @@ url = "https://raw.githubusercontent.com/LambdaGeo/luccme-goldens/{ref}/{path}"
 "goldens/labs_per_year/lab17/manifest.json" = "06cb81ed35445ee6bf114d35455907db48fa1561664e5558fc7b47693ae38913"
 "goldens/labs_per_year/lab17/terrame.log" = "0579bb72144cddb6850605c848181a51d27f396aaa1de818a59d122f4e811465"
 "sources/labs/lab17.lua" = "2a092ac91d885fe6e4ce9a9ca0a137c36284e223f2a7f3b1f3983cc9a1fb9f26"
+
+# The two LuccME Lua components that tests/test_lua_differential.py runs (through lupa) next to their
+# Python ports. They come from the reference image's own source tree, at the exact tag of the image the
+# goldens were generated with, and are not copied into this repository (LuccME is LGPL-3.0).
+[lua_source]
+repo = "profsergiocosta/terrame-docker"
+ref = "v0.4.2"
+commit = "2c62aa9457844117549ad872a52a2943191f46e8"
+doi = "10.5281/zenodo.23160784"
+url = "https://raw.githubusercontent.com/profsergiocosta/terrame-docker/{ref}/{path}"
+
+[lua_files]
+"luccme/lua/AllocationCClueLikeSaturation.lua" = "83c0b606b49f90be05415844e0292ed9130089e66c339b3cedbf9b2d17fcdc84"
+"luccme/lua/PotentialCSpatialLagRegression.lua" = "e07afeccf47559ffb5a3ad986da38ce75808e71ecbbe962d1e6d87f891571696"

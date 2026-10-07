@@ -10,3 +10,4 @@ pandas>=2.0.0
 
 # Tests
 pytest>=7
+lupa>=2.0   # tests/test_lua_differential.py runs the original LuccME Lua components
