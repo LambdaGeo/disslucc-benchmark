@@ -3,7 +3,7 @@ message: "If you use this benchmark suite, please cite it as below."
 type: software
 title: "disslucc-benchmark: Reproducible Validation of disslucc against the LuccME 3.1 Labs"
 abstract: "Benchmark that runs disslucc on the LuccME functional labs and compares it, year by year and cell by cell, with the TerraME 2.0.1 goldens of luccme-goldens, reporting how much of LuccME the Python implementation reproduces."
-version: 0.2.1
+version: 0.2.2
 date-released: 2026-10-07
 license: MIT
 url: "https://github.com/LambdaGeo/disslucc-benchmark"
