@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+- Scenarios `lab04`, `lab05`, `lab16` and `lab17`: lab02 and lab15 with the demand computed from the layers
+  (`DemandComputeTwoDates` / `DemandComputeThreeDates`). All four reproduce TerraME with identical iteration
+  counts; max abs error 2.4e-06, 2.3e-06, 1.2e-07 and 1.2e-07. Validated labs: 10 of 21. Requires disslucc
+  `3e32384` or later; `requirements.txt` is pinned to it. Their reference files are pinned in `references.toml`
+  (hashes read from the `v1.1.0` tag).
+- Wording: the LuccME guard that never runs `correctCellChange` is described as a field-name mismatch.
+
 - Scenarios `lab02` and `lab07`: the spatial-lag potential of lab03 with the plain CClueLike allocation
   (lab07 to 2025, with the 2009 and 2020 driver updates). Both reproduce TerraME with components that
-  already existed in disslucc, iterations identical, max abs error 2.3e-06 and 3.0e-06. Validated labs: 6 of 21.
+  already existed in disslucc, iterations identical, max abs error 2.3e-06 and 3.0e-06. Validated labs: 6 of 21 at that point.
 
 - `citation.yml`: validates `CITATION.cff` against the CFF 1.2.0 schema, exports it the way Zenodo
   reads it, checks the ORCID checksum and that `date-released` is not in the future, and on a `v*`

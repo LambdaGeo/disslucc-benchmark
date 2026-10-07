@@ -23,6 +23,8 @@ from disslucc import (
     AllocationClueLikeSaturation,
     AllocationDClueSLike,
     AllocationSpec,
+    DemandComputeThreeDates,
+    DemandComputeTwoDates,
     DemandPreComputedValues,
     LogisticRegressionSpec,
     PotentialDLogisticRegression,
@@ -170,8 +172,8 @@ LAB03_DECLARED = [
 ]
 
 
-def _spatial_lag(updates: dict[int, str], *, saturation: bool, years: list[int], demand_rows: list[list[float]],
-                 max_difference: float) -> Run:
+def _spatial_lag(updates: dict[int, str], *, saturation: bool, years: list[int], demand_rows: list[list[float]] | None = None,
+                 max_difference: float, demand_layers: list[str] | None = None, demand_factory=None) -> Run:
     """PreComputedValues + CSpatialLagRegression + CClueLikeSaturation (saturation=True: lab03, lab06)
     or CClueLike (lab02, lab07). `updates` maps a year to the layer whose columns replace the
     drivers from that year (LuccME's updateYears)."""
@@ -179,7 +181,7 @@ def _spatial_lag(updates: dict[int, str], *, saturation: bool, years: list[int],
     rows, cols = cells["row"].astype(int).values, cells["col"].astype(int).values
     drivers_used = sorted({d for s in LAB03_SPECS for d in s.betas})
     # float64: the saturation/spatial-lag labs are compared at 1e-9 (the goldens keep 12 decimals)
-    backend, rows, cols = _grid(cells, CSAC_LUS + drivers_used, dtype=np.float64)
+    backend, rows, cols = _grid(cells, CSAC_LUS + drivers_used + (demand_layers or []), dtype=np.float64)
     new_layers = {y: gpd.read_file(ref.layer(name)) for y, name in updates.items()}
 
     class Updates(Model):
@@ -206,7 +208,10 @@ def _spatial_lag(updates: dict[int, str], *, saturation: bool, years: list[int],
 
     env = Environment(end_time=len(years) - 1)
     Updates()
-    demand = DemandPreComputedValues(annual_demand=demand_rows, land_use_types=CSAC_LUS)
+    if demand_factory is not None:
+        demand = demand_factory(backend)   # lab04/lab05: the demand is read from the layers themselves
+    else:
+        demand = DemandPreComputedValues(annual_demand=demand_rows, land_use_types=CSAC_LUS)
     potential = PotentialSpatialLagRegression(
         backend=backend, potential_data=[copy.deepcopy(LAB03_SPECS)], demand=demand,  # deepcopy: the component writes the adapted const back
         land_use_types=CSAC_LUS, land_use_no_data="outros",
@@ -254,6 +259,25 @@ LAB02_DECLARED = [*[v for row in CSAC_DEMAND for v in row], *_SPEC_NUMBERS, 1643
 LAB07_DECLARED = [*[v for row in LAB07_DEMAND for v in row], *_SPEC_NUMBERS, 2000.0, *_ALLOC_COMMON]
 
 
+# lab04 / lab05: lab02 with the demand computed from the layers (DemandComputeTwoDates / ThreeDates)
+# instead of a table: the start-year areas are the f/d/outros columns, the later ones f2011, f2014, ...
+def _csac_two_dates(backend):
+    return DemandComputeTwoDates(
+        backend=backend, land_use_types=CSAC_LUS, final_land_use_types=["f2014", "d2014", "outros"],
+        start_year=2008, end_year=2014, final_year=2014, cell_area=25.0)
+
+
+def _csac_three_dates(backend):
+    return DemandComputeThreeDates(
+        backend=backend, land_use_types=CSAC_LUS,
+        middle_land_use_types=["f2011", "d2011", "outros"], final_land_use_types=["f2014", "d2014", "outros"],
+        start_year=2008, end_year=2014, middle_year=2011, final_year=2014, cell_area=25.0)
+
+
+LAB04_DECLARED = [*_SPEC_NUMBERS, 1643.0, *_ALLOC_COMMON, 2014.0]
+LAB05_DECLARED = [*_SPEC_NUMBERS, 1643.0, *_ALLOC_COMMON, 2011.0, 2014.0]
+
+
 # ── cs_moju lab (discrete, 1999-2004): lab15 ─────────────────────────────────────────────────
 
 MOJU_LUS = ["f", "d", "o"]
@@ -279,12 +303,13 @@ LAB15_DECLARED = [
 LAB15_MAX_DIFFERENCE = 300.0
 
 
-def lab15(max_difference: float = 300.0) -> Run:
-    """PreComputedValues + DLogisticRegression + DClueSLike (maxDifference 300 in the lab script)."""
+def _moju(max_difference: float, make_demand=None, extra: list[str] | None = None) -> Run:
+    """DLogisticRegression + DClueSLike over cs_moju; `make_demand(backend)` builds the demand
+    (a table for lab15, the layers themselves for lab16 and lab17)."""
     cells = gpd.read_file(ref.layer("cs_moju"))
-    backend, rows, cols = _grid(cells, MOJU_LUS + MOJU_DRIVERS)
+    backend, rows, cols = _grid(cells, MOJU_LUS + MOJU_DRIVERS + (extra or []))
     env = Environment(end_time=len(MOJU_YEARS) - 1)
-    demand = DemandPreComputedValues(annual_demand=MOJU_DEMAND, land_use_types=MOJU_LUS)
+    demand = make_demand(backend) if make_demand else DemandPreComputedValues(annual_demand=MOJU_DEMAND, land_use_types=MOJU_LUS)
     PotentialDLogisticRegression(backend=backend, potential_data=[copy.deepcopy(MOJU_SPECS)], land_use_types=MOJU_LUS)
     allocation = AllocationDClueSLike(
         backend=backend, demand=demand, land_use_types=MOJU_LUS,
@@ -294,6 +319,30 @@ def lab15(max_difference: float = 300.0) -> Run:
     rec = _Recorder(backend=backend, rows=rows, cols=cols, land_use_types=MOJU_LUS)
     env.run()
     return _finish(allocation, rec, MOJU_YEARS)
+
+
+def lab15(max_difference: float = 300.0) -> Run:
+    """PreComputedValues + DLogisticRegression + DClueSLike (maxDifference 300 in the lab script)."""
+    return _moju(max_difference)
+
+
+# lab16 / lab17: lab15 with the demand computed from the layers (f04/d04 in 2004, f07/d07 in 2007)
+def lab16() -> Run:
+    return _moju(LAB15_MAX_DIFFERENCE, extra=["f04", "d04"], make_demand=lambda b: DemandComputeTwoDates(
+        backend=b, land_use_types=MOJU_LUS, final_land_use_types=["f04", "d04", "o"],
+        start_year=1999, end_year=2004, final_year=2004, cell_area=1.0))
+
+
+def lab17() -> Run:
+    return _moju(LAB15_MAX_DIFFERENCE, extra=["f04", "d04", "f07", "d07"], make_demand=lambda b: DemandComputeThreeDates(
+        backend=b, land_use_types=MOJU_LUS,
+        middle_land_use_types=["f04", "d04", "o"], final_land_use_types=["f07", "d07", "o"],
+        start_year=1999, end_year=2004, middle_year=2004, final_year=2007, cell_area=1.0))
+
+
+_MOJU_NO_DEMAND = LAB15_DECLARED[len(MOJU_DEMAND) * 3:]   # betas, elasticities and allocation constants
+LAB16_DECLARED = [*_MOJU_NO_DEMAND, LAB15_MAX_DIFFERENCE, 2004.0]
+LAB17_DECLARED = [*_MOJU_NO_DEMAND, LAB15_MAX_DIFFERENCE, 2004.0, 2007.0]
 
 
 SCENARIOS: dict[str, Scenario] = {
@@ -316,7 +365,14 @@ SCENARIOS: dict[str, Scenario] = {
     # docs/validation.md comes from. Reported only: TerraME never runs correctCellChange.
     "lab01_md1643/cell_correction": Scenario("lab01", lambda: lab01(cell_correction=True, max_difference=1643.0), LAB01_DECLARED,
                                              golden="lab01_md1643", max_difference=1643.0),
+    "lab04": Scenario("lab04", lambda: _spatial_lag({}, saturation=False, years=CSAC_YEARS, max_difference=1643.0,
+                                                    demand_layers=["f2014", "d2014"], demand_factory=_csac_two_dates), LAB04_DECLARED),
+    "lab05": Scenario("lab05", lambda: _spatial_lag({}, saturation=False, years=CSAC_YEARS, max_difference=1643.0,
+                                                    demand_layers=["f2011", "d2011", "f2014", "d2014"],
+                                                    demand_factory=_csac_three_dates), LAB05_DECLARED),
     "lab15": Scenario("lab15", lab15, LAB15_DECLARED + [LAB15_MAX_DIFFERENCE]),
+    "lab16": Scenario("lab16", lab16, LAB16_DECLARED),
+    "lab17": Scenario("lab17", lab17, LAB17_DECLARED),
     "lab15_md10": Scenario("lab15", lambda: lab15(max_difference=10.0), LAB15_DECLARED,
                            golden="lab15_md10", max_difference=10.0),
 }

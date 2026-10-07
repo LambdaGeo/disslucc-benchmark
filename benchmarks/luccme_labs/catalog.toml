@@ -28,15 +28,15 @@ missing = ""
 id = "lab04"
 paradigm = "Continuous"
 components = "DemandComputeTwoDates + PotentialCSpatialLagRegression + AllocationCClueLike"
-implemented = "partial"
-missing = "DemandComputeTwoDates"
+implemented = "all"
+missing = ""
 
 [[lab]]
 id = "lab05"
 paradigm = "Continuous"
 components = "DemandComputeThreeDates + PotentialCSpatialLagRegression + AllocationCClueLike"
-implemented = "partial"
-missing = "DemandComputeThreeDates"
+implemented = "all"
+missing = ""
 
 [[lab]]
 id = "lab06"
@@ -114,15 +114,15 @@ missing = ""
 id = "lab16"
 paradigm = "Discrete"
 components = "DemandComputeTwoDates + PotentialDLogisticRegression + AllocationDClueSLike"
-implemented = "partial"
-missing = "DemandComputeTwoDates"
+implemented = "all"
+missing = ""
 
 [[lab]]
 id = "lab17"
 paradigm = "Discrete"
 components = "DemandComputeThreeDates + PotentialDLogisticRegression + AllocationDClueSLike"
-implemented = "partial"
-missing = "DemandComputeThreeDates"
+implemented = "all"
+missing = ""
 
 [[lab]]
 id = "lab18"
