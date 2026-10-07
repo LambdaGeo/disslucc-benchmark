@@ -104,7 +104,7 @@ The scenarios call the disslucc models directly and **do not go through the exec
 | Reference outputs, lab scripts, input layers | [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) | `v1.1.0`, DOI [10.5281/zenodo.23161342](https://doi.org/10.5281/zenodo.23161342) (`references.toml`, every file with its SHA-256) |
 | Lua components (differential test) | [`terrame-docker`](https://github.com/profsergiocosta/terrame-docker) | `v0.4.2`, DOI [10.5281/zenodo.23160784](https://doi.org/10.5281/zenodo.23160784) (`[lua_files]` in `references.toml`, SHA-256) |
 | Reference generator | [`terrame-docker`](https://github.com/LambdaGeo/terrame-docker) / `profsergiocosta/terrame-luccme` | TerraME 2.0.1 + LuccME 3.1, recorded in each golden's `manifest.json` |
-| Benchmark | this repository | `v0.2.0` (DOI of this release on Zenodo; see `CITATION.cff`) |
+| Benchmark | this repository | `v0.2.1` (DOI of this release on Zenodo; see `CITATION.cff`) |
 
 To use another version of the goldens: `make pins REF=<tag> GOLDENS=../luccme-goldens [DOI=...]`. It rewrites `references.toml` with the hashes read from `git show <ref>:<path>`, so nothing is copied by hand; a modified file fails with a hash mismatch.
 
