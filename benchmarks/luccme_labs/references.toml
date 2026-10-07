@@ -57,3 +57,33 @@ url = "https://raw.githubusercontent.com/LambdaGeo/luccme-goldens/{ref}/{path}"
 "sources/labs/data/csAC_cenarioA_2020.dbf" = "a107ee639d0fbea7fdc9ae53ede46642c1c247357aaf15520c114c2cd7b7690e"
 "sources/labs/data/csAC_cenarioA_2020.shx" = "2eba45b6f20dd3eec8a7e9d401e21a14a0ab49d93edd280af485a58b2426fc98"
 "sources/labs/data/csAC_cenarioA_2020.prj" = "e908f36376343a9fc35faf56c02ce51c3c9d59b154f617f38992c092f2ee03e9"
+"goldens/labs_per_year/lab04/lab04.csv.gz" = "5b1072cae96edf3b7bce2f93f97666fe576f3b42d7d0476b898907b6978ee93e"
+"goldens/labs_per_year/lab04/manifest.json" = "6de8517c9a06b2a49f9399cb655498345c14d7d6984597d744df1ef378f78747"
+"goldens/labs_per_year/lab04/terrame.log" = "e11b040fd48cb13a98f38cb9c2a9b9fd2151d87ebf5d9e236092933d3480e12d"
+"sources/labs/lab04.lua" = "0103ea96f7af66808f0bddba6b15a02b7c95dfdee1b6016366226bf85ced249d"
+"goldens/labs_per_year/lab05/lab05.csv.gz" = "8c7431ea9cb1b9bfd1de808e54f3eb2b777b0a03e6bd48e32257fe953d671d12"
+"goldens/labs_per_year/lab05/manifest.json" = "a4ee72c5c55c2dc6c7aa9f6da83ddd5cd554ecb9b95df7a2363bdaa0ecc5775f"
+"goldens/labs_per_year/lab05/terrame.log" = "fcec26aff96d72f9a64d34de7a0c19f59de1e84d351fe186455e3560b5223831"
+"sources/labs/lab05.lua" = "ee7e128fec6b77c77c8085e3d792a5a942fa4a70dde8df1bea52062b4a240671"
+"goldens/labs_per_year/lab16/lab16.csv.gz" = "0ac581cc89eb7d04b6e57c2f8ed9657833512eef64b9eef07ac4c380eb2b40c7"
+"goldens/labs_per_year/lab16/manifest.json" = "3b232d7fbeb03a811e1f207a19d9f9a72a2cdadbca8e23bd90bc3d7ef77a9383"
+"goldens/labs_per_year/lab16/terrame.log" = "e94ca4bdfacc8ed9a9c1f8514e6b01f22103ffcab6d106348d4d766224fd253a"
+"sources/labs/lab16.lua" = "482813af7a24564316ebeea0b465a60095cf16dc727ce8be39becb88e7f4054b"
+"goldens/labs_per_year/lab17/lab17.csv.gz" = "0ac581cc89eb7d04b6e57c2f8ed9657833512eef64b9eef07ac4c380eb2b40c7"
+"goldens/labs_per_year/lab17/manifest.json" = "06cb81ed35445ee6bf114d35455907db48fa1561664e5558fc7b47693ae38913"
+"goldens/labs_per_year/lab17/terrame.log" = "0579bb72144cddb6850605c848181a51d27f396aaa1de818a59d122f4e811465"
+"sources/labs/lab17.lua" = "2a092ac91d885fe6e4ce9a9ca0a137c36284e223f2a7f3b1f3983cc9a1fb9f26"
+
+# The two LuccME Lua components that tests/test_lua_differential.py runs (through lupa) next to their
+# Python ports. They come from the reference image's own source tree, at the exact tag of the image the
+# goldens were generated with, and are not copied into this repository (LuccME is LGPL-3.0).
+[lua_source]
+repo = "profsergiocosta/terrame-docker"
+ref = "v0.4.2"
+commit = "2c62aa9457844117549ad872a52a2943191f46e8"
+doi = "10.5281/zenodo.23160784"
+url = "https://raw.githubusercontent.com/profsergiocosta/terrame-docker/{ref}/{path}"
+
+[lua_files]
+"luccme/lua/AllocationCClueLikeSaturation.lua" = "83c0b606b49f90be05415844e0292ed9130089e66c339b3cedbf9b2d17fcdc84"
+"luccme/lua/PotentialCSpatialLagRegression.lua" = "e07afeccf47559ffb5a3ad986da38ce75808e71ecbbe962d1e6d87f891571696"

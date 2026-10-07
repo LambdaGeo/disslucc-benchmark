@@ -6,7 +6,7 @@
 #   expect = "differs"     reported only; used where the two differ by construction
 #
 # Thresholds are regression guards set just above what was measured (see README, section 4):
-# float32 paths (lab01, lab15, and the CClueLike labs lab02 and lab07) leave 1e-7 to 3e-6 of noise; the float64 labs agree to the 12
+# float32 paths (lab01, lab15, lab16, lab17, and the CClueLike labs lab02, lab04, lab05 and lab07) leave 1e-7 to 3e-6 of noise; the float64 labs agree to the 12
 # decimals the goldens keep (5e-13).
 
 [lab01]
@@ -16,7 +16,7 @@ max_abs_error = 1e-6
 
 ["lab01/cell_correction"]
 # disslucc runs correctCellChange by default (the intended algorithm). TerraME never does:
-# its guard reads `cell.regionregionAloc`, a typo for `regionAloc`, so it is always false.
+# its guard reads the field `cell.regionregionAloc` instead of `regionAloc`, so it is always false.
 expect = "differs"
 iterations = "exact"
 
@@ -32,6 +32,18 @@ iterations = "exact"
 max_abs_error = 1e-9
 max_error_rel = 1e-9
 
+[lab04]
+# lab02 with the demand computed from the layers (DemandComputeTwoDates, final year 2014).
+expect = "match"
+iterations = "exact"
+max_abs_error = 1e-5
+
+[lab05]
+# lab04 through a middle year (DemandComputeThreeDates, 2011 and 2014).
+expect = "match"
+iterations = "exact"
+max_abs_error = 1e-5
+
 [lab06]
 expect = "match"
 iterations = "exact"
@@ -45,6 +57,18 @@ iterations = "exact"
 max_abs_error = 1e-5
 
 [lab15]
+expect = "match"
+iterations = "exact"
+max_abs_error = 1e-6
+
+[lab16]
+# lab15 with the demand computed from the layers (DemandComputeTwoDates, final year 2004).
+expect = "match"
+iterations = "exact"
+max_abs_error = 1e-6
+
+[lab17]
+# lab16 through a middle year (DemandComputeThreeDates, 2004 and 2007). The simulation ends in 2004, so only the first segment is used and the result equals lab16's.
 expect = "match"
 iterations = "exact"
 max_abs_error = 1e-6

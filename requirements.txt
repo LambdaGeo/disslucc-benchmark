@@ -1,6 +1,6 @@
 # Engine under test: disslucc, pinned to the commit the results were produced with
-# (pyproject version 0.4.0). Switch to a released version once the LuccME-BR components are on PyPI.
-disslucc @ git+https://github.com/DisSModel/disslucc.git@450f4db8e7b01ab24f508f2ec5d340ef5c5c7d6e
+# (pyproject version 0.4.0, with the date demands). Switch to a released version once disslucc is on PyPI.
+disslucc @ git+https://github.com/DisSModel/disslucc.git@3e323844f9d2f19acc698bfb3cea36af87fe94dd
 
 # Reference download (SHA-256 verified) and analysis
 pooch>=1.8.0
@@ -10,3 +10,4 @@ pandas>=2.0.0
 
 # Tests
 pytest>=7
+lupa>=2.0   # tests/test_lua_differential.py runs the original LuccME Lua components
