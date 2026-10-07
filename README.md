@@ -17,7 +17,7 @@ No reference data is stored here. Goldens, lab scripts and input layers are down
 
 ```bash
 git clone https://github.com/LambdaGeo/disslucc-benchmark && cd disslucc-benchmark
-make install        # disslucc (pinned commit) + dependencies
+make install        # disslucc 0.5.0 (PyPI) + dependencies
 make benchmark      # downloads the references (~20 MB, once), runs, prints the table; exit 1 if a criterion is missed
 make coverage       # which of the 21 labs disslucc covers
 make timing         # time and peak memory of each scenario (informational)
@@ -39,7 +39,7 @@ The thresholds are **regression guards**, set just above what was measured, not 
 
 ## 3. Results
 
-disslucc `3e32384` (0.4.0 plus the date demands) · dissmodel 0.6.5 · goldens: `luccme-goldens` `v1.1.0` (TerraME 2.0.1 + LuccME 3.1).
+disslucc 0.5.0 · dissmodel 0.6.5 · goldens: `luccme-goldens` `v1.1.0` (TerraME 2.0.1 + LuccME 3.1).
 
 | Scenario | Components | Cells | Years | Iterations vs TerraME | MAE (worst column) | Max abs error | Criterion | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -100,11 +100,11 @@ The scenarios call the disslucc models directly and **do not go through the exec
 
 | Level | Artifact | Pinned version |
 | --- | --- | --- |
-| Engine | [`disslucc`](https://github.com/DisSModel/disslucc) | commit `3e32384` (`requirements.txt`) |
+| Engine | [`disslucc`](https://github.com/DisSModel/disslucc) | `0.5.0` on PyPI, DOI [10.5281/zenodo.23219338](https://doi.org/10.5281/zenodo.23219338) (`requirements.txt`) |
 | Reference outputs, lab scripts, input layers | [`luccme-goldens`](https://github.com/LambdaGeo/luccme-goldens) | `v1.1.0`, DOI [10.5281/zenodo.23161342](https://doi.org/10.5281/zenodo.23161342) (`references.toml`, every file with its SHA-256) |
 | Lua components (differential test) | [`terrame-docker`](https://github.com/profsergiocosta/terrame-docker) | `v0.4.2`, DOI [10.5281/zenodo.23160784](https://doi.org/10.5281/zenodo.23160784) (`[lua_files]` in `references.toml`, SHA-256) |
 | Reference generator | [`terrame-docker`](https://github.com/LambdaGeo/terrame-docker) / `profsergiocosta/terrame-luccme` | TerraME 2.0.1 + LuccME 3.1, recorded in each golden's `manifest.json` |
-| Benchmark | this repository | `v0.1.0` (no DOI yet; see `CITATION.cff` for how to cite) |
+| Benchmark | this repository | `v0.2.0` (DOI of this release on Zenodo; see `CITATION.cff`) |
 
 To use another version of the goldens: `make pins REF=<tag> GOLDENS=../luccme-goldens [DOI=...]`. It rewrites `references.toml` with the hashes read from `git show <ref>:<path>`, so nothing is copied by hand; a modified file fails with a hash mismatch.
 
@@ -113,7 +113,7 @@ To use another version of the goldens: `make pins REF=<tag> GOLDENS=../luccme-go
 ```text
 disslucc-benchmark/
 ├── Makefile                      # install, benchmark, coverage, references, test
-├── requirements.txt              # disslucc pinned by commit
+├── requirements.txt              # disslucc pinned to the released 0.5.0
 ├── benchmarks/luccme_labs/
 │   ├── references.toml           # luccme-goldens release + SHA-256 of every file used
 │   ├── references.py             # download + hash check (pooch)
@@ -130,7 +130,6 @@ disslucc-benchmark/
 
 Pending:
 
-- Archive this repository's own release on Zenodo and add its DOI to `CITATION.cff`.
 - Next labs: those missing a single component (section 4).
 - Not migrated from disslucc: the discriminance tests and the Pontius & Millones metrics; they test the implementation rather than parity with a golden. (The finding of the lab15 test is recorded in section 5.)
 - Remove `benchmark/` from disslucc and point its tests and docs here, once this benchmark is accepted.

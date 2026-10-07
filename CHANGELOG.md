@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 (2026-10-07)
+
+- Engine: `requirements.txt` now pins the released `disslucc==0.5.0` (PyPI, DOI 10.5281/zenodo.23219338)
+  instead of a git commit. Re-run with it: the same 10 of 21 labs and both `maxDifference` variants reproduce
+  TerraME with identical iteration counts (max abs error 2.96e-06, lab07); 57 tests pass.
 
 - Scenarios `lab04`, `lab05`, `lab16` and `lab17`: lab02 and lab15 with the demand computed from the layers
   (`DemandComputeTwoDates` / `DemandComputeThreeDates`). All four reproduce TerraME with identical iteration

@@ -1,6 +1,5 @@
-# Engine under test: disslucc, pinned to the commit the results were produced with
-# (pyproject version 0.4.0, with the date demands). Switch to a released version once disslucc is on PyPI.
-disslucc @ git+https://github.com/DisSModel/disslucc.git@3e323844f9d2f19acc698bfb3cea36af87fe94dd
+# Engine under test: disslucc, the released version the results were produced with.
+disslucc==0.5.0
 
 # Reference download (SHA-256 verified) and analysis
 pooch>=1.8.0
