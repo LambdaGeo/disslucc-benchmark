@@ -60,6 +60,14 @@ disslucc 0.5.0 · dissmodel 0.6.5 · goldens: `luccme-goldens` `v1.1.0` (TerraME
 
 The 5e-13 of lab03/lab06 is the precision of the goldens (12 decimals). The 1e-7 of lab01/lab15/lab16/lab17 and the up to 3e-6 of lab02/lab04/lab05/lab07 (almost all in the `f` potential) are float32 noise of the raster backend and of the CClueLike path.
 
+### What the results look like
+
+<p align="center">
+  <img src="docs/fig_models.png" width="92%" alt="A continuous and a discrete LuccME model, disslucc above and TerraME below, same cells and same colour limits" />
+</p>
+
+*Figure: one continuous and one discrete model, disslucc 0.5.0 on the top row and the TerraME 2.0.1 golden on the bottom row, on the same cells and with the same colour limits. Left, `lab01` (PreComputed + CLinearRegression + CClueLike, 6,574 cells): the deforested fraction `d` in 2014 and its change since 2008. Right, `lab15_md10` (PreComputed + DLogisticRegression + DClueSLike with `maxDifference` 10, 5,914 cells): the class of each cell in 2004 and the cells that changed class since 1999, coloured by the new class (237 cells). Under each column, the largest absolute difference of the lab (5e-07 and 1.2e-07, float32 noise) and whether the iterations of the allocation match TerraME's. The two rows are not expected to be distinguishable by eye; the table above has the numbers. `lab15` itself is not drawn because with `maxDifference` 300 no cell changes class (section 5). Regenerate with `make figure`.*
+
 ### Where disslucc differs from LuccME on purpose
 
 `lab01/cell_correction` and `lab01_md1643/cell_correction`: LuccME's `AllocationCClueLike` never runs `correctCellChange`: its guard reads the field `cell.regionregionAloc` instead of `regionAloc`, so it is always false. disslucc runs the correction by default (the intended algorithm). The `lab01` and `lab01_md1643` scenarios set `cell_correction=False`, which reproduces TerraME in every year and every iteration count; the two extra scenarios pin the size of the deviation with the default.

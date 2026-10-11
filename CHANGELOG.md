@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Documentation: a figure of a continuous (`lab01`) and a discrete (`lab15_md10`) model, disslucc against the TerraME
+  golden, in the README (`make figure`, `benchmarks/luccme_labs/figure_models.py`, `docs/fig_models.png`). No scenario,
+  criterion or result changes. `requirements.txt` adds `matplotlib`, used only by the figure.
+
 ## 0.2.0 (2026-10-07)
 
 - Engine: `requirements.txt` now pins the released `disslucc==0.5.0` (PyPI, DOI 10.5281/zenodo.23219338)

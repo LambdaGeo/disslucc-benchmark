@@ -7,7 +7,7 @@ SHELL := /bin/bash
 PY ?= python3
 LAB ?=
 
-.PHONY: help install benchmark coverage references timing pins test clean
+.PHONY: help install benchmark coverage references timing figure pins test clean
 REPS ?= 5
 GOLDENS ?= ../luccme-goldens
 REF ?=
@@ -20,6 +20,7 @@ help:
 	@echo "  make benchmark            Run every scenario and compare with the goldens"
 	@echo "  make benchmark LAB=lab03  Run one scenario (names are in benchmarks/luccme_labs/labs.toml)"
 	@echo "  make coverage             Which of the 21 LuccME labs disslucc covers"
+	@echo "  make figure               Figure of a continuous and a discrete model, disslucc vs TerraME (docs/fig_models.png)"
 	@echo "  make references           Download and SHA-256-verify every pinned reference file"
 	@echo "  make timing [REPS=5]      Time and peak memory of the scenarios (informational; LAB=lab03 for one)"
 	@echo "  make pins REF=v1.1.0      Re-pin references.toml to a luccme-goldens ref (GOLDENS=../luccme-goldens DOI=...)"
@@ -40,6 +41,9 @@ references:
 
 timing:
 	$(PY) benchmarks/luccme_labs/timing.py $(LAB) --reps $(REPS)
+
+figure:
+	$(PY) benchmarks/luccme_labs/figure_models.py --out docs/fig_models.png
 
 pins:
 	@test -n "$(REF)" || (echo "usage: make pins REF=v1.1.0 [GOLDENS=../luccme-goldens] [DOI=10.5281/zenodo.N]"; exit 2)
