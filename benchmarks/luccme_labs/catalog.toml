@@ -137,14 +137,14 @@ id = "lab19"
 paradigm = "Discrete"
 components = "DemandComputeTwoDates + PotentialDLogisticRegressionNeighAttractRepulsion + AllocationDClueSNeighOrdering"
 implemented = "none"
-missing = "DemandComputeTwoDates, PotentialDLogisticRegressionNeighAttractRepulsion, AllocationDClueSNeighOrdering"
+missing = "PotentialDLogisticRegressionNeighAttractRepulsion, AllocationDClueSNeighOrdering"
 
 [[lab]]
 id = "lab20"
 paradigm = "Discrete"
 components = "DemandComputeTwoDates + PotentialDLogisticRegressionNeighAttractRepulsion + AllocationDClueSLike"
 implemented = "partial"
-missing = "DemandComputeTwoDates, PotentialDLogisticRegressionNeighAttractRepulsion"
+missing = "PotentialDLogisticRegressionNeighAttractRepulsion"
 
 [[lab]]
 id = "lab21"
