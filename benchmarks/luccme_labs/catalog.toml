@@ -136,7 +136,7 @@ update_years = "2009"
 id = "lab19"
 paradigm = "Discrete"
 components = "DemandComputeTwoDates + PotentialDLogisticRegressionNeighAttractRepulsion + AllocationDClueSNeighOrdering"
-implemented = "none"
+implemented = "partial"
 missing = "PotentialDLogisticRegressionNeighAttractRepulsion, AllocationDClueSNeighOrdering"
 
 [[lab]]
